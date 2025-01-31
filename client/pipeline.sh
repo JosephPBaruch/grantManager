@@ -3,7 +3,7 @@
 IMAGE="grant-mgmt-client"
 
 # Stop and remove existing container
-if [ "$(docker ps -q -f name=$IMAGE)" ]; then
+if [ "$(docker ps -a -f name=$IMAGE)" ]; then
     echo "Stopping and removing existing $IMAGE container..."
     docker stop $IMAGE
     docker rm $IMAGE
@@ -21,4 +21,4 @@ docker build -t $IMAGE .
 
 # Run container
 echo "Running the new $IMAGE Docker container..."
-docker run -d -p 8080:8080 --name $IMAGE $IMAGE
+docker run -d -p 8081:8081 --name $IMAGE $IMAGE
