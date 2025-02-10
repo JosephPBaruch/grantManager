@@ -4,7 +4,7 @@ import ViewTransactions from './Components/ViewTransactions';
 import ListUsers from './Components/ListUsers';
 import CreateUser from './Components/CreateUser';
 import { makeStyles } from '@mui/styles';
-import { AppBar, Toolbar, Typography, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, CssBaseline } from '@mui/material';
 
 const useStyles = makeStyles({
   root: {
@@ -13,9 +13,13 @@ const useStyles = makeStyles({
     justifyContent: 'center',
     width: '100vw',
     textAlign: 'center',
+    marginTop: '64px', // Adjust for AppBar height
   },
   appBar: {
     marginBottom: '20px',
+    position: 'fixed',
+    top: 0,
+    width: '100%',
   },
   link: {
     color: 'white',
@@ -32,7 +36,8 @@ function App() {
 
   return (
     <Router>
-      <AppBar position="static" className={classes.appBar}>
+      <CssBaseline />
+      <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
             GrantManagement
