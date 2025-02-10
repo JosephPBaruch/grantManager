@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Button, TextField, Container, Typography } from '@mui/material';
+import { Button, TextField, Container, Typography, Checkbox, FormControlLabel } from '@mui/material';
 
 const CreateUser: React.FC = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [admin, setAdmin] = useState(false);
+    const [budgetName, setBudgetName] = useState('');
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -14,7 +16,7 @@ const CreateUser: React.FC = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password }),
+            body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password, admin, budgetName }),
         }).then((response) => {
             if (response.ok) {
                 console.log('User created!');
@@ -65,6 +67,23 @@ const CreateUser: React.FC = () => {
                     fullWidth
                     margin="normal"
                     required
+                />
+                <TextField
+                    label="Budget Name"
+                    value={budgetName}
+                    onChange={(e) => setBudgetName(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={admin}
+                            onChange={(e) => setAdmin(e.target.checked)}
+                            color="primary"
+                        />
+                    }
+                    label="Admin"
                 />
                 <Button type="submit" variant="contained" color="primary" fullWidth>
                     Create User
