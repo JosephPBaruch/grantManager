@@ -26,6 +26,12 @@ const useStyles = makeStyles({
     color: 'white',
     textDecoration: 'none',
     marginRight: '15px',
+    '&:hover': {
+      color: '#ffcc00', // Change to desired hover color
+    },
+    '&:active': {
+      color: '#ff9900', // Change to desired active color
+    },
   },
   title: { 
     flexGrow: 1,
@@ -52,7 +58,7 @@ function App() {
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
-            GrantManagement
+            UIdaho Grant Management
           </Typography>
           <Button color="inherit">
             <Link to="/transactions" className={classes.link}>Make Transaction</Link>
