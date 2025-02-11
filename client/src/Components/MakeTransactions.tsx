@@ -30,7 +30,7 @@ function Transactions() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ amount, description }), // user needs to be set somehow through a sign in session or something
+      body: JSON.stringify({ amount, description, user: 1 }), // user needs to be set somehow through a sign in session or something
     }).then((response) => {
       if (response.ok) {
         console.log('Transaction created!');
