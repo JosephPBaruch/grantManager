@@ -46,7 +46,7 @@ function ViewTransactions() {
       <Typography variant="h4" component="h1" gutterBottom>
         Transactions
       </Typography>
-      <TableContainer component={Paper} className={classes.tableContainer}>
+      <TableContainer style={{backgroundColor: "#e0e0e0" }} component={Paper} className={classes.tableContainer}>
         <Table className={classes.table} aria-label="transactions table">
           <TableHead>
             <TableRow>

@@ -48,7 +48,7 @@ const CreateUser: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" component="h1" gutterBottom>
+      <Typography style={{paddingTop: '20px'}} variant="h4" component="h1" gutterBottom>
         Create User
       </Typography>
       <form onSubmit={handleSubmit} className={classes.form}>

@@ -4,16 +4,17 @@ import ViewTransactions from './Components/ListTransaction';
 import ListUsers from './Components/ListUsers';
 import CreateUser from './Components/CreateUser';
 import { makeStyles } from '@mui/styles';
-import { AppBar, Toolbar, Typography, Button, CssBaseline } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mui/material';
 
 const useStyles = makeStyles({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    minHeight: '100vh',
     width: '100vw',
     textAlign: 'center',
-    marginTop: '64px', // Adjust for AppBar height
+    marginTop: '64px',
   },
   appBar: {
     marginBottom: '20px',
@@ -28,7 +29,18 @@ const useStyles = makeStyles({
   },
   title: { 
     flexGrow: 1,
-  }
+  },
+  content: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  footer: {
+    padding: '20px',
+    backgroundColor: '#f5f5f5',
+    textAlign: 'center',
+  },
 });
 
 function App() {
@@ -57,13 +69,21 @@ function App() {
         </Toolbar>
       </AppBar>
       <div className={classes.root}>
-        <Routes>
-          <Route path="/" element={<h1>Home</h1>} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/list-transactions" element={<ViewTransactions />} />
-          <Route path="/list-users" element={<ListUsers />} />
-          <Route path="/users" element={<CreateUser />} />
-        </Routes>
+        <div className={classes.content}>
+          <Routes>
+            <Route path="/" element={<h1>Home</h1>} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/list-transactions" element={<ViewTransactions />} />
+            <Route path="/list-users" element={<ListUsers />} />
+            <Route path="/users" element={<CreateUser />} />
+          </Routes>
+        </div>
+        <footer className={classes.footer}>
+          <Container maxWidth="sm">
+            <Typography variant="body1">GrantManagement © 2023</Typography>
+            <Typography variant="body2">Contact: info@grantmanagement.com</Typography>
+          </Container>
+        </footer>
       </div>
     </Router>
   );
