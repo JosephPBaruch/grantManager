@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import Transactions from './Components/Transactions';
-import ViewTransactions from './Components/ViewTransactions';
+import Transactions from './Components/MakeTransactions';
+import ViewTransactions from './Components/ListTransaction';
 import ListUsers from './Components/ListUsers';
 import CreateUser from './Components/CreateUser';
 import { makeStyles } from '@mui/styles';
@@ -46,13 +46,13 @@ function App() {
             <Link to="/transactions" className={classes.link}>Make Transaction</Link>
           </Button>
           <Button color="inherit">
-            <Link to="/all-transactions" className={classes.link}>View Transactions</Link>
+            <Link to="/list-transactions" className={classes.link}>Transactions</Link>
           </Button>
           <Button color="inherit">
             <Link to="/users" className={classes.link}>Create Users</Link>
           </Button>
           <Button color="inherit">
-            <Link to="/list-users" className={classes.link}>List Users</Link>
+            <Link to="/list-users" className={classes.link}>Users</Link>
           </Button>
         </Toolbar>
       </AppBar>
@@ -60,7 +60,7 @@ function App() {
         <Routes>
           <Route path="/" element={<h1>Home</h1>} />
           <Route path="/transactions" element={<Transactions />} />
-          <Route path="/all-transactions" element={<ViewTransactions />} />
+          <Route path="/list-transactions" element={<ViewTransactions />} />
           <Route path="/list-users" element={<ListUsers />} />
           <Route path="/users" element={<CreateUser />} />
         </Routes>
