@@ -1,37 +1,19 @@
--- Insert into Pets
-INSERT INTO Pets (Name, Age, StreetNumber, City, ZipCode, State, TypeofPet) VALUES
-('Buddy', 3, '12', 'New York', '10001', 'NY', 'Dog'),
-('Mittens', 2, '456', 'Los Angeles', '90001', 'CA', 'Cat'),
-('Charlie', 5, '789', 'Chicago', '60601', 'IL', 'Dog');
+-- Insert into Users
+INSERT INTO Users (FirstName, LastName, Email, PasswordHash) VALUES
+('John', 'Doe', 'john.doe@example.com', 'hashedpassword1'),
+('Jane', 'Smith', 'jane.smith@example.com', 'hashedpassword2'),
+('Alice', 'Johnson', 'alice.johnson@example.com', 'hashedpassword3');
 
--- Insert into Owners
-INSERT INTO Owners (LastName, StreetNumber, City, ZipCode, State, Age, AnnualIncome) VALUES
-('Smith', '12', 'New York', '10001', 'NY', 16, 0),
-('Johnson', '34', 'Los Angeles', '90001', 'CA', 42, 75000),
-('Brown', '56', 'Moscow', '10001', 'Idaho', 17, 0);
+-- Insert into Grants
+INSERT INTO Grants (GrantName, TotalBudget, RemainingBudget) VALUES
+('Research Grant A', 100000.00, 80000.00),
+('Community Grant B', 50000.00, 45000.00),
+('Education Grant C', 75000.00, 60000.00);
 
--- Insert into Owns
-INSERT INTO Owns (PetID, OID, Year, PetAgeatOwnership, PricePaid) VALUES
-(1, 1, 2021, 1, 500.00),
-(2, 2, 2022, 1, 300.00),
-(3, 3, 2020, 3, 700.00);
-
--- Insert into Foods
-INSERT INTO Foods (Name, Brand, TypeofFood, Price, ItemWeight, ClassofFood) VALUES
-('Kibble Plus', 'Purina', 'Dry', 15.99, 5.0, 'Premium'),
-('Whiskas Delight', 'Whiskas', 'Wet', 12.50, 2.5, 'Standard'),
-('Whiskas Delight', 'Whiskas', 'Wet', 12.51, 2.5, 'Standard'),
-('Organic Treats', 'Nature’s Best', 'Dry', 20.00, 3.0, 'Organic'), 
-('Organic Treats', 'Nature’s Best', 'Dry', 26.00, 3.0, 'Organic');
-
--- Insert into Likes
-INSERT INTO Likes (PetID, TypeofFood) VALUES
-(1, 'Soggy'),
-(2, 'Wet'),
-(3, 'Dry');
-
--- Insert into Purchases
-INSERT INTO Purchases (OID, FoodID, PetID, Month, Year, Quantity) VALUES
-(1, 1, 1, 'January', 2024, 2),
-(2, 2, 2, 'February', 2024, 1),
-(3, 3, 3, 'March', 2024, 3);
+-- Insert into Transactions
+INSERT INTO Transactions (GrantID, UserID, Amount, TransactionDate, Description) VALUES
+(1, 1, 5000.00, '2023-01-15', 'Purchase of lab equipment'),
+(2, 2, 3000.00, '2023-02-20', 'Community event expenses'),
+(3, 3, 1500.00, '2023-03-10', 'Educational materials'),
+(1, 1, 2000.00, '2023-04-05', 'Research materials'),
+(2, 2, 1000.00, '2023-05-12', 'Community outreach program');
