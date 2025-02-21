@@ -81,3 +81,49 @@ USE budget;
 ```sql
 mysqldump -u root -p budget > budget_db.sql
 ```
+
+## Clear the Database 
+
+```sql
+SET FOREIGN_KEY_CHECKS = 0;
+
+SET @tables = NULL;
+SELECT GROUP_CONCAT('`', table_name, '`') INTO @tables
+FROM information_schema.tables
+WHERE table_schema = (SELECT DATABASE());
+
+SET @tables = CONCAT('DROP TABLE IF EXISTS ', @tables);
+PREPARE stmt FROM @tables;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET FOREIGN_KEY_CHECKS = 1;
+```
+
+## Common Commands for this Dataset
+
+```sql
+SELECT Sum(Amount) from transactions;
+```
+
+## Triggers
+
+### Remove Triggers 
+
+```sql
+drop trigger if exists <name>;
+```
+
+### List Triggers
+
+```sql
+SELECT TRIGGER_NAME
+FROM information_schema.TRIGGERS
+WHERE TRIGGER_SCHEMA = DATABASE();
+```
+
+
+### Running alchemy.py
+```sh
+python alchemy.py
+```

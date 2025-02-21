@@ -12,8 +12,8 @@ INSERT INTO Grants (GrantName, TotalBudget, RemainingBudget) VALUES
 
 -- Insert into Transactions
 INSERT INTO Transactions (GrantID, UserID, Amount, TransactionDate, Description) VALUES
-(1, 1, 5000.00, '2023-01-15', 'Purchase of lab equipment'),
-(2, 2, 3000.00, '2023-02-20', 'Community event expenses'),
-(3, 3, 1500.00, '2023-03-10', 'Educational materials'),
-(1, 1, 2000.00, '2023-04-05', 'Research materials'),
+(1, 1, 1000.00, '2023-01-15', 'Purchase of lab equipment'),
+(2, 2, 1000.00, '2023-02-20', 'Community event expenses'),
+(3, 3, 1000.00, '2023-03-10', 'Educational materials'),
+(1, 1, 1000.00, '2023-04-05', 'Research materials'),
 (2, 2, 1000.00, '2023-05-12', 'Community outreach program');
