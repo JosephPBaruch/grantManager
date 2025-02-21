@@ -123,7 +123,8 @@ WHERE TRIGGER_SCHEMA = DATABASE();
 ```
 
 
-### Running alchemy.py
-```sh
-python alchemy.py
-```
+### Docker
+
+> We should look into running a mysql container with docker to make sure the environment stays the 
+> same and we can set one configuration for the both of us. 
+> For now, use .env
