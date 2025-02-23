@@ -3,7 +3,7 @@ import os
 import sys
 from dotenv import load_dotenv
 
-load_dotenv('./.env')
+load_dotenv('../.env')
 
 # HOW TO USE
 # Run: 
