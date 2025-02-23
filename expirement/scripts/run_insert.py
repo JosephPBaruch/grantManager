@@ -36,3 +36,6 @@ if __name__ == "__main__":
     
     filename = sys.argv[1]
     execute_sql_script(filename)
+
+
+# python run_insert.py ../sql/insert.sql

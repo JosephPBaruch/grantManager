@@ -1,5 +1,3 @@
-DELIMITER //
-
 CREATE TRIGGER check_transaction_budget
 BEFORE INSERT ON Transactions
 FOR EACH ROW
@@ -16,6 +14,3 @@ BEGIN
         SET MESSAGE_TEXT = 'Transaction exceeds the total budget limit of 6000';
     END IF;
 END;
-
-//
-DELIMITER ;
