@@ -1,5 +1,9 @@
 # MySQL Help
 
+## ENV
+
+    source env/bin/activate
+
 ## Create a MySQL Database
 > Do this only the first time.
 

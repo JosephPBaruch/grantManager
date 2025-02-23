@@ -1,13 +1,18 @@
 import pymysql
 import os
+import sys
 from dotenv import load_dotenv
 
 load_dotenv('./.env')
 
+# HOW TO USE
+# Run: 
+#     python run_sql.py <file.sql>
+
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': os.getenv('DB_PASSWORD'), # You will need to set this env var in a .env
+    'password': os.getenv('DB_PASSWORD'),  # You will need to set this env var in a .env
     'database': 'budget'
 }
 
@@ -24,4 +29,10 @@ def execute_sql_script(filename):
     finally:
         connection.close()
 
-execute_sql_script('/Users/joseph.baruch/REPO/grantManager/expirement/insert.sql')
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python run_sql.py <file.sql>")
+        sys.exit(1)
+    
+    filename = sys.argv[1]
+    execute_sql_script(filename)
