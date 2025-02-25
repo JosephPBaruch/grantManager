@@ -1,4 +1,3 @@
--- Table: Users
 CREATE TABLE Users (
     UserID INT PRIMARY KEY AUTO_INCREMENT,
     FirstName VARCHAR(50),
@@ -7,7 +6,6 @@ CREATE TABLE Users (
     PasswordHash VARCHAR(255)
 );
 
--- Table: Grants
 CREATE TABLE Grants (
     GrantID INT PRIMARY KEY AUTO_INCREMENT,
     GrantName VARCHAR(100),
@@ -15,7 +13,6 @@ CREATE TABLE Grants (
     RemainingBudget DECIMAL(15,2)
 );
 
--- Table: Transactions
 CREATE TABLE Transactions (
     TransactionID INT PRIMARY KEY AUTO_INCREMENT,
     GrantID INT,
