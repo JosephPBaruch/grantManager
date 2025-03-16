@@ -1,1 +1,3 @@
 postgres/*
+postgres/
+.obsidian/workspace
