@@ -1,0 +1,3 @@
+2025-03-14 00:39:34 PDT LOG:  database system was shut down at 2025-03-14 00:38:59 PDT
+2025-03-14 00:44:34 PDT LOG:  checkpoint starting: time
+2025-03-14 00:44:34 PDT LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.098 s, sync=0.015 s, total=0.157 s; sync files=3, longest=0.006 s, average=0.005 s; distance=0 kB, estimate=0 kB; lsn=0/1E085F0, redo lsn=0/1E08598

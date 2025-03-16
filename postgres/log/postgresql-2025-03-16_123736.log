@@ -1,0 +1,4 @@
+2025-03-16 12:37:36 PDT LOG:  starting PostgreSQL 17.4 on x86_64-windows, compiled by msvc-19.42.34436, 64-bit
+2025-03-16 12:37:36 PDT LOG:  listening on IPv6 address "::", port 5432
+2025-03-16 12:37:36 PDT LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-03-16 12:37:36 PDT LOG:  database system was interrupted; last known up at 2025-03-14 00:44:34 PDT
