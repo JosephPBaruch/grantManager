@@ -1,0 +1,13 @@
+2025-03-16 12:37:36 PDT LOG:  starting PostgreSQL 17.4 on x86_64-windows, compiled by msvc-19.42.34436, 64-bit
+2025-03-16 12:37:36 PDT LOG:  listening on IPv6 address "::", port 5432
+2025-03-16 12:37:36 PDT LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-03-16 12:37:36 PDT LOG:  database system was interrupted; last known up at 2025-03-14 00:44:34 PDT
+2025-03-16 12:37:36 PDT LOG:  database system was not properly shut down; automatic recovery in progress
+2025-03-16 12:37:36 PDT LOG:  redo starts at 0/1E08598
+2025-03-16 12:37:36 PDT LOG:  invalid record length at 0/1E086A0: expected at least 24, got 0
+2025-03-16 12:37:36 PDT LOG:  redo done at 0/1E08668 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-03-16 12:37:36 PDT LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-03-16 12:37:37 PDT LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.005 s, total=0.021 s; sync files=2, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=0/1E086A0, redo lsn=0/1E086A0
+2025-03-16 12:37:37 PDT LOG:  database system is ready to accept connections
+2025-03-16 12:57:36 PDT LOG:  checkpoint starting: time
+2025-03-16 12:57:37 PDT LOG:  checkpoint complete: wrote 12 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.221 s, sync=0.037 s, total=1.288 s; sync files=12, longest=0.012 s, average=0.004 s; distance=35 kB, estimate=35 kB; lsn=0/1E113A0, redo lsn=0/1E11348

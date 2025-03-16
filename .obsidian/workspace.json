@@ -165,18 +165,18 @@
   },
   "active": "108d56dcd518b48d",
   "lastOpenFiles": [
-    "postgres/postmaster.pid",
-    "postgres/base/1/pg_internal.init",
-    "postgres/pg_stat/pgstat.stat",
-    "postgres/pg_logical/replorigin_checkpoint.tmp",
-    "postgres/base/16388/pg_internal.init",
-    "postgres/base/5/pg_internal.init",
-    "postgres/global/pg_internal.init",
-    "postgres/log/postgresql-2025-03-16_135612.log",
-    "postgres/log/postgresql-2025-03-16_123736.log",
-    "docs/backend/temp.csv",
+    "postgres/postgres - Shortcut.lnk",
+    "postgres/base/16388/2604_REMOTE_1309",
+    "postgres/base/16388/2604_LOCAL_1309",
+    "postgres/base/16388/2604_BASE_1309",
+    "postgres/base/16388/2604_BACKUP_1309",
+    "postgres/base/16388/1259.orig",
+    "postgres/base/16388/1259_REMOTE_1309",
+    "postgres/base/16388/1259_LOCAL_1309",
+    "postgres/base/16388/1259_BASE_1309",
+    "postgres/base/16388/1259_BACKUP_1309",
+    "postgres/base/16388/1259_REMOTE_659",
     "docs/backend/Rules_ERD.png",
-    "docs/backend/Rules.md",
-    "postgres.json"
+    "docs/backend/Rules.md"
   ]
 }

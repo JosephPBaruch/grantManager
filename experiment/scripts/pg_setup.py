@@ -1,4 +1,5 @@
 import psycopg
+
 from pathlib import Path
 
 SETUP_SQL = Path(__file__).parent.parent / 'sql' / 'pg_setup.sql'
