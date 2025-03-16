@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
-router = APIRouter(prefix="/rules")
+router = APIRouter(prefix="/rules",tags=["Rules"])
 
 class Item(BaseModel):
     id: int = Field(0,gt=0, le=100)
@@ -17,12 +17,13 @@ async  def read_root():
     return TEMP
 
 
-@router.get("/items/{item_id}")
+
+@router.get("/rules/{item_id}")
 async def read_item(item_id: int):
     return TEMP.get(item_id, None)
 
 
-@router.post("/items", response_model=Item)
+@router.post("/rules", response_model=Item)
 async def set_item(item:Item):
     TEMP[item.id] = item
     return item
