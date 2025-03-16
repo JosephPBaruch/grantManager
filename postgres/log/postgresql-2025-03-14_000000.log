@@ -1,4 +1,0 @@
-2025-03-14 00:38:54 PDT ERROR:  canceling statement due to user request
-2025-03-14 00:38:59 PDT LOG:  shutting down
-2025-03-14 00:38:59 PDT LOG:  checkpoint starting: shutdown immediate
-2025-03-14 00:38:59 PDT LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.044 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=74 kB; lsn=0/1E084E8, redo lsn=0/1E084E8
