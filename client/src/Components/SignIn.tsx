@@ -1,6 +1,7 @@
 import { Container, Typography, Paper, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
   root: {
@@ -29,12 +30,12 @@ function SignIn() {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     // Fetch Here
-    console.log('Email:', email);
-    console.log('Password:', password);
+    navigate("/budgets")
   };
 
   return (
