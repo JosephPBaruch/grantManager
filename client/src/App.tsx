@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import Transactions from './Components/MakeTransactions';
 import ViewTransactions from './Components/ListTransaction';
 import ListUsers from './Components/ListUsers';
@@ -10,6 +10,7 @@ import CreateBudget from './Components/CreateBudget';
 import Budgets from './Components/Budgets';
 import SignUp from './Components/SignUp';
 import ProtectedRoute from './Components/ProtectedRoute';
+import { useState } from 'react';
 
 const useStyles = makeStyles({
   root: {
@@ -65,8 +66,16 @@ function App() {
 
 function LocationBasedComponents() {
   const location = useLocation();
+  const navigate = useNavigate();
   const classes = useStyles();
   const hideHeaderFooter = ['/', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Example state for authentication
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    navigate("/")
+    // Add sign-out logic here
+  };
 
   return (
     <>
@@ -88,6 +97,16 @@ function LocationBasedComponents() {
             <Button color="inherit">
               <Link to="/list-users" className={classes.link}>Users</Link>
             </Button>
+            {isAuthenticated && (
+              <>
+                <Button color="inherit">
+                  <Link to="/create-budget" className={classes.link}>Change Budget</Link>
+                </Button>
+                <Button color="inherit" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </>
+            )}
           </Toolbar>
         </AppBar>
       )}
@@ -97,6 +116,7 @@ function LocationBasedComponents() {
             <Route path="/" element={<SignIn />} />
             <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
             <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
+            {/* <Route path="/list-transactions" element={<ViewTransactions />} /> */}
             <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
             <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-up" element={<SignUp />} />
