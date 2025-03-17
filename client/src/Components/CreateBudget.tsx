@@ -57,7 +57,10 @@ function CreateBudget() {
 
   return (
     <Container maxWidth="sm" className={classes.root}>
-      <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4">
+            UIdaho Grant Management
+        </Typography>
+      <Typography variant="h6" gutterBottom>
         Create Budget
       </Typography>
       <Paper className={classes.form} component="form" onSubmit={handleSubmit}>

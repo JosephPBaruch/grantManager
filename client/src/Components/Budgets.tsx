@@ -55,7 +55,10 @@ function Budgets() {
 
   return (
     <Container maxWidth="sm" className={classes.root}>
-      <Typography variant="h4" component="h1" gutterBottom>
+        <Typography variant="h4">
+                UIdaho Grant Management
+        </Typography>
+      <Typography variant="h6"  gutterBottom>
         Budgets
       </Typography>
       {budgets.length > 0 ? (

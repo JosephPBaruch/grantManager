@@ -50,7 +50,10 @@ const SignUp: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography style={{paddingTop: '20px'}} variant="h4" component="h1" gutterBottom>
+      <Typography variant="h4">
+        UIdaho Grant Management
+      </Typography>
+      <Typography style={{paddingTop: '20px'}} variant="h6" component="h1" gutterBottom>
         Sign Up
       </Typography>
       <form onSubmit={handleSubmit} className={classes.form}>
