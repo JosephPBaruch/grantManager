@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import Transactions from './Components/MakeTransactions';
 import ViewTransactions from './Components/ListTransaction';
 import ListUsers from './Components/ListUsers';
@@ -60,25 +60,38 @@ function App() {
   return (
     <Router>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
-        <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            UIdaho Grant Management
-          </Typography>
-          <Button color="inherit">
-            <Link to="/transactions" className={classes.link}>Make Transaction</Link>
-          </Button>
-          <Button color="inherit">
-            <Link to="/list-transactions" className={classes.link}>Transactions</Link>
-          </Button>
-          <Button color="inherit">
-            <Link to="/users" className={classes.link}>Create Users</Link>
-          </Button>
-          <Button color="inherit">
-            <Link to="/list-users" className={classes.link}>Users</Link>
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <LocationBasedComponents classes={classes} />
+    </Router>
+  );
+}
+
+function LocationBasedComponents({ classes }) {
+  const location = useLocation();
+  const hideHeaderFooter = ['/sign-in', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
+
+  return (
+    <>
+      {!hideHeaderFooter && (
+        <AppBar position="fixed" className={classes.appBar}>
+          <Toolbar>
+            <Typography variant="h6" className={classes.title}>
+              UIdaho Grant Management
+            </Typography>
+            <Button color="inherit">
+              <Link to="/transactions" className={classes.link}>Make Transaction</Link>
+            </Button>
+            <Button color="inherit">
+              <Link to="/list-transactions" className={classes.link}>Transactions</Link>
+            </Button>
+            <Button color="inherit">
+              <Link to="/users" className={classes.link}>Create Users</Link>
+            </Button>
+            <Button color="inherit">
+              <Link to="/list-users" className={classes.link}>Users</Link>
+            </Button>
+          </Toolbar>
+        </AppBar>
+      )}
       <div className={classes.root}>
         <div className={classes.content}>
           <Routes>
@@ -93,14 +106,16 @@ function App() {
             <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
           </Routes>
         </div>
-        <footer className={classes.footer}>
-          <Container maxWidth="sm">
-            <Typography variant="body1">GrantManagement © 2023</Typography>
-            <Typography variant="body2">Contact: info@grantmanagement.com</Typography>
-          </Container>
-        </footer>
+        {!hideHeaderFooter && (
+          <footer className={classes.footer}>
+            <Container maxWidth="sm">
+              <Typography variant="body1">GrantManagement © 2023</Typography>
+              <Typography variant="body2">Contact: info@grantmanagement.com</Typography>
+            </Container>
+          </footer>
+        )}
       </div>
-    </Router>
+    </>
   );
 }
 
