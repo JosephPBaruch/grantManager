@@ -165,6 +165,7 @@
   },
   "active": "108d56dcd518b48d",
   "lastOpenFiles": [
+    "backend/app/initial_data.py",
     "backend/app/api/routes/__pycache__/private.cpython-312.pyc",
     "backend/app/api/routes/private.py",
     "backend/app/api/routes/__pycache__/utils.cpython-312.pyc",
@@ -175,7 +176,6 @@
     "backend/app/__pycache__/models.cpython-312.pyc",
     "backend/app/core/__pycache__/security.cpython-312.pyc",
     "backend/app/__pycache__/crud.cpython-312.pyc",
-    "backend/app/api/routes/__pycache__/login.cpython-312.pyc",
     "expirement/README.md",
     "experiment/README.md",
     "docs/backend/Rules_ERD.png",
