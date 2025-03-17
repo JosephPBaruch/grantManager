@@ -55,19 +55,18 @@ const useStyles = makeStyles({
 });
 
 function App() {
-  const classes = useStyles();
-
   return (
     <Router>
       <CssBaseline />
-      <LocationBasedComponents classes={classes} />
+      <LocationBasedComponents />
     </Router>
   );
 }
 
-function LocationBasedComponents({ classes }) {
+function LocationBasedComponents() {
   const location = useLocation();
-  const hideHeaderFooter = ['/sign-in', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
+  const classes = useStyles();
+  const hideHeaderFooter = ['/', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
 
   return (
     <>
@@ -95,12 +94,11 @@ function LocationBasedComponents({ classes }) {
       <div className={classes.root}>
         <div className={classes.content}>
           <Routes>
-            <Route path="/" element={<h1>Home</h1>} />
+            <Route path="/" element={<SignIn />} />
             <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
             <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
             <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
             <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
-            <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/create-budget" element={<ProtectedRoute element={<CreateBudget />} />} />
             <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
