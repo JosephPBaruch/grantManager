@@ -1,30 +1,62 @@
-from fastapi import APIRouter
-from pydantic import BaseModel, Field
+from typing import Any
 
-router = APIRouter(prefix="/rules",tags=["Rules"])
+from app.api.deps import SessionDep, TableNamesDep, get_current_active_superuser
+from app.models import Rule, RuleCreate, RulePublic, RulesPublic
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import func, select
 
-class Item(BaseModel):
-    id: int = Field(0,gt=0, le=100)
-    data: str = Field("")
+router = APIRouter(prefix="/rules", tags=["Rules"])
 
-TEMP = {
-    1: Item(id=1, data="Hello"),
-    2: Item(id=2, data="World"),
-}
 
 @router.get("/")
-async  def read_root():
-    return TEMP
+async def get_rules(session: SessionDep):
+    ""
+    rules = session.exec(select(Rule)).all()
+    return rules
 
 
+@router.get(
+    "/",
+    dependencies=[Depends(get_current_active_superuser)],
+    response_model=RulesPublic,
+)
+def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+    """
+    Returns a list of all the current rules in the database.
+    """
 
-@router.get("/rules/{item_id}")
-async def read_item(item_id: int):
-    return TEMP.get(item_id, None)
+    count_statement = select(func.count()).select_from(Rule)
+    count = session.exec(count_statement).one()
+
+    statement = select(Rule).offset(skip).limit(limit)
+    users = session.exec(statement).all()
+
+    return RulesPublic(data=users, count=count)
 
 
-@router.post("/rules", response_model=Item)
-async def set_item(item:Item):
-    TEMP[item.id] = item
-    return item
+@router.post("/", response_model=RulePublic)
+def create_rule(
+    *, session: SessionDep, table_names: TableNamesDep, rule_create: RuleCreate
+) -> Rule:
+    r = Rule.model_validate(rule_create, update={"Trigger": ""})
+    if r.Table not in table_names:
+        raise HTTPException(
+            status_code=400,
+            detail=f"The Table must exist in the database. Valid tables: {table_names}",
+        )
+    session.exec(select())
+    session.add(r)
+    session.commit()
+    session.refresh(r)
+    return r
 
+
+# @router.get("/rules/{item_id}")
+# async def read_item(item_id: int):
+#     return TEMP.get(item_id, None)
+
+
+# @router.post("/rules", response_model=Item)
+# async def set_item(item: Item):
+#     TEMP[item.id] = item
+#     return item
