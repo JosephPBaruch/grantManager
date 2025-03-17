@@ -5,6 +5,8 @@ import ListUsers from './Components/ListUsers';
 import CreateUser from './Components/CreateUser';
 import { makeStyles } from '@mui/styles';
 import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mui/material';
+import SignIn from './Components/SignIn';
+import CreateBudget from './Components/CreateBudget';
 
 const useStyles = makeStyles({
   root: {
@@ -82,6 +84,8 @@ function App() {
             <Route path="/list-transactions" element={<ViewTransactions />} />
             <Route path="/list-users" element={<ListUsers />} />
             <Route path="/users" element={<CreateUser />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/create-budget" element={<CreateBudget />} />
           </Routes>
         </div>
         <footer className={classes.footer}>
