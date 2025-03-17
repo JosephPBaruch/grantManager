@@ -9,6 +9,7 @@ import SignIn from './Components/SignIn';
 import CreateBudget from './Components/CreateBudget';
 import Budgets from './Components/Budgets';
 import SignUp from './Components/SignUp';
+import ProtectedRoute from './Components/ProtectedRoute';
 
 const useStyles = makeStyles({
   root: {
@@ -82,14 +83,14 @@ function App() {
         <div className={classes.content}>
           <Routes>
             <Route path="/" element={<h1>Home</h1>} />
-            <Route path="/transactions" element={<Transactions />} />
-            <Route path="/list-transactions" element={<ViewTransactions />} />
-            <Route path="/list-users" element={<ListUsers />} />
-            <Route path="/users" element={<CreateUser />} />
+            <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
+            <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
+            <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
+            <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/create-budget" element={<CreateBudget />} />
-            <Route path="/budgets" element={<Budgets />} />
+            <Route path="/create-budget" element={<ProtectedRoute element={<CreateBudget />} />} />
+            <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
           </Routes>
         </div>
         <footer className={classes.footer}>
