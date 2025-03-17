@@ -8,6 +8,7 @@ import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mu
 import SignIn from './Components/SignIn';
 import CreateBudget from './Components/CreateBudget';
 import Budgets from './Components/Budgets';
+import SignUp from './Components/SignUp';
 
 const useStyles = makeStyles({
   root: {
@@ -86,6 +87,7 @@ function App() {
             <Route path="/list-users" element={<ListUsers />} />
             <Route path="/users" element={<CreateUser />} />
             <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
             <Route path="/create-budget" element={<CreateBudget />} />
             <Route path="/budgets" element={<Budgets />} />
           </Routes>
