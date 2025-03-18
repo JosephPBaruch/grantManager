@@ -26,7 +26,7 @@ then you need to run the migration script.
 
 Create a new migration. (ONLY RUN IF YOU UPDATED THE MODELS)
 ```sh
-    alembic revision -m "CHANGE DESCRIPTION"
+    alembic revision --autogenerate -m "CHANGE DESCRIPTION"
 ```
 
 Update the db to the current migration

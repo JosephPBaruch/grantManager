@@ -5,7 +5,7 @@ from app.core.config import settings
 from app.models import User, UserCreate
 from sqlalchemy import Engine
 from sqlalchemy.schema import CreateSchema
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Session, create_engine, select
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,10 +23,9 @@ def create_schema(engine: Engine, db_schema: str):
 
 
 def init_db(session: Session) -> None:
-    # Create Rules schema
+    # from sqlalchemy import SQLModel
 
-    # This works because the models are already imported and registered from app.models
-    SQLModel.metadata.create_all(engine)
+    # SQLModel.metadata.create_all(engine)
 
     user = session.exec(
         select(User).where(User.email == settings.FIRST_SUPERUSER)
