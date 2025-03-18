@@ -258,6 +258,7 @@ PyJWT @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_e55d
 pylint @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/pylint_1699242870766/work
 pylint-venv @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_80rsj1kckp/croot/pylint-venv_1709837627074/work
 pyls-spyder==0.4.0
+PyMySQL==1.1.1
 pyobjc-core @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_342uq4g0a3/croot/pyobjc-core_1710189033492/work
 pyobjc-framework-Cocoa @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_157_nv38zo/croot/pyobjc-framework-cocoa_1710191895205/work
 pyobjc-framework-CoreServices @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_88_zqrgmok/croot/pyobjc-framework-coreservices_1710193940178/work
