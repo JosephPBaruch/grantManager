@@ -49,14 +49,3 @@ def create_rule(
     session.commit()
     session.refresh(r)
     return r
-
-
-# @router.get("/rules/{item_id}")
-# async def read_item(item_id: int):
-#     return TEMP.get(item_id, None)
-
-
-# @router.post("/rules", response_model=Item)
-# async def set_item(item: Item):
-#     TEMP[item.id] = item
-#     return item

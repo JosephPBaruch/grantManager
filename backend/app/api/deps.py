@@ -30,10 +30,13 @@ def get_tables() -> Generator[list[str], None, None]:
         "Actions",
         "alembic_version",
         "user",
-        "Rule",
+        "Rules",
         "Conditions",
     ]:
-        names.remove(name)
+        try:
+            names.remove(name)
+        except ValueError:
+            pass
     yield names
 
 
