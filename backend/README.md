@@ -20,6 +20,19 @@ To run and install the application use the following
 ```sh
     pip install -e .
 ```
+## Postgres Migration
+If this is your first time running the backend or if you update the backend models file
+then you need to run the migration script.
+
+Create a new migration. (ONLY RUN IF YOU UPDATED THE MODELS)
+```sh
+    alembic revision -m "CHANGE DESCRIPTION"
+```
+
+Update the db to the current migration
+```sh
+    alembic upgrade head
+```
 
 ## Running the Application
 
