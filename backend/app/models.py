@@ -1,10 +1,11 @@
 import uuid
+from datetime import datetime
 from typing import Optional
 
 from pydantic import EmailStr
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import TEXT
-from sqlmodel import Field, SQLModel
+from sqlmodel import TIMESTAMP, Field, SQLModel
 
 
 # Shared properties
@@ -89,7 +90,7 @@ class RuleBase(SQLModel):
 class Rule(RuleBase, table=True):
     """Rules Table."""
 
-    __tablename__ = "Rule"
+    __tablename__ = "Rules"
     RuleID: Optional[int] = Field(default=None, primary_key=True)
     Trigger: Optional[str] = Field(sa_column=Column(TEXT))
 
@@ -136,6 +137,26 @@ class Actions(SQLModel, table=True):
 
     __tablename__ = "Actions"
     id: Optional[int] = Field(default=None, primary_key=True)
-    RuleID: int = Field(foreign_key="Rule.RuleID")
+    RuleID: int = Field(foreign_key="Rules.RuleID")
     CID: int = Field(foreign_key="Conditions.CID")
     Conjunction: str = Field(default="AND", sa_column=Column(TEXT))
+
+
+class BudgetBase(SQLModel):
+    """Base Budget Model."""
+
+    name: str = Field(min_length=2, max_length=40)
+    funding_source: str = Field()
+    start_date: datetime = Field(
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    end_date: datetime = Field(
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+
+
+class BudgetTable(BudgetBase, table=True):
+    """Budget Table Model."""
+
+    __tablename__ = "budget"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)

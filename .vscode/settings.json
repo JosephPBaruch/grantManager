@@ -8,5 +8,5 @@
         },
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
-    "ruff.organizeImports": false,
+    "ruff.organizeImports": true,
 }

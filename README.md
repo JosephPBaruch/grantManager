@@ -12,8 +12,11 @@ Refer to ./client/README.md for how to run the frontend.
 
 ## backend
 
-Built using Django and Django Rest Framework.
+Built using FastAPI, Postgres.
 
 ### How to Run
-
-Refer to ./backend/README.md for how to run the backend.
+Run:
+```sh
+    docker compose up -d
+```
+Refer to [backend/README](backend/README) for more information
