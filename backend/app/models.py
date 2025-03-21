@@ -115,7 +115,7 @@ class Selectors(SQLModel, table=True):
 
     __tablename__ = "Selectors"
     SID: Optional[int] = Field(default=None, primary_key=True)
-    Schema: Optional[str] = Field(default=None, sa_column=Column(TEXT))
+    # Schema: Optional[str] = Field(default=None, sa_column=Column(TEXT))
     Table: Optional[str] = Field(default=None, sa_column=Column(TEXT))
     Target: str = Field(sa_column=Column(TEXT))
     Aggregator: str = Field(default="MAX", sa_column=Column(TEXT))

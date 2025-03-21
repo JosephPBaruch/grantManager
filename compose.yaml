@@ -1,5 +1,5 @@
+version: '3'
 services:
-
   db:
     image: postgres:12
     restart: always
@@ -19,7 +19,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
     ports:
-      - "${POSTGRES_PORT?5432}:${POSTGRES_PORT?5432}"
+      - "5433:5432"
 
   prestart:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
