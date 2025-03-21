@@ -1,3 +1,4 @@
+INSERT_TRIGGER_RULE = """
 DROP FUNCTION IF EXISTS create_rule_function;
 CREATE OR REPLACE FUNCTION create_rule_function(rule_id integer) RETURNS text
 AS $$
@@ -74,4 +75,5 @@ AS $$
 
 $$ LANGUAGE plpython3u;
 
-SELECT create_rule_function(1)
+-- SELECT create_rule_function(1)
+"""

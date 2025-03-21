@@ -141,6 +141,13 @@ class Actions(SQLModel, table=True):
     Conjunction: str = Field(default="AND", sa_column=Column(TEXT))
 
 
+class _RulesSystemTables(SQLModel, table=True):
+    """Meta Table for specifying tables not part of the rules system."""
+
+    __tablename__ = "SystemRulesTables"
+    name: Optional[str] = Field(default=None, primary_key=True)
+
+
 class BudgetBase(SQLModel):
     """Base Budget Model."""
 
@@ -152,6 +159,7 @@ class BudgetBase(SQLModel):
     end_date: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
     )
+    amount: float = Field(default=0)
 
 
 class BudgetTable(BudgetBase, table=True):

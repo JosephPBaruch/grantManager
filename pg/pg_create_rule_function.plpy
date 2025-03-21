@@ -73,5 +73,3 @@ AS $$
     return function_name
 
 $$ LANGUAGE plpython3u;
-
-SELECT create_rule_function(1)
