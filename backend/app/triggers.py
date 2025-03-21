@@ -1,3 +1,6 @@
+# Backup's for alembic Triggers
+
+
 INSERT_TRIGGER_RULE = """
 DROP FUNCTION IF EXISTS create_rule_function;
 CREATE OR REPLACE FUNCTION create_rule_function(rule_id integer) RETURNS text
@@ -23,6 +26,17 @@ AS $$
             subquery = f'''(SELECT {cached_selections[sid]["Aggregator"]}({temp_id}."{cached_selections[sid]["Target"]}") FROM {table} {temp_id})::{cached_selections[sid]["Type"]}'''
         plpy.notice(sid, cached_selections[sid], subquery)
         return (cached_selections, subquery)
+
+    result = plpy.prepare(
+        'SELECT a."RuleID", a."CID", a."Conjunction", c."LeftSID", c."Operator", c."RightSID" \
+            FROM "Actions" a INNER JOIN "Conditions" c \
+            ON c."CID" = a."CID" \
+            WHERE r."RuleID" = $1; \
+        ', ["integer"]
+    )
+    result = plan.execute([rule_id])
+    if not len(result):
+        return ''
 
     plan = plpy.prepare(
         'SELECT r."RuleID", "Name", "Description", "Trigger", "CID", "Conjunction", "LeftSID", "Operator", "RightSID" \
@@ -75,5 +89,45 @@ AS $$
 
 $$ LANGUAGE plpython3u;
 
--- SELECT create_rule_function(1)
+"""
+
+
+TRIGGER_FUNCTION = """
+CREATE OR REPLACE FUNCTION rules_trigger_setter()
+RETURNS TRIGGER 
+LANGUAGE PLPGSQL AS $$
+BEGIN
+	IF (TG_OP = 'UPDATE') THEN
+	NEW."Trigger" = create_rule_function(NEW."RuleID");
+		UPDATE public."Rules" 
+			SET "Trigger" = NEW."Trigger" 
+			WHERE "RuleID" = OLD."RuleID";
+			IF NOT FOUND THEN RETURN NULL; END IF;
+	
+	ELSIF (TG_OP = 'INSERT') THEN
+		NEW."Trigger" = create_rule_function(NEW."RuleID");
+		INSERT INTO public."Rules" 
+		VALUES (NEW.*);
+		RETURN NEW;
+	
+	ELSIF (TG_OP = 'DELETE') THEN
+		DELETE FROM public."Rules" 
+		WHERE "RuleID" = OLD."RuleID";
+		IF NOT FOUND THEN 
+			RETURN NULL; 
+		END IF;
+		DROP FUNCTION OLD."Trigger";
+	END IF;
+RETURN NEW;
+END; 
+$$; 
+"""
+
+
+APPLY_TRIGGER = """
+CREATE OR REPLACE TRIGGER rt_ins 
+AFTER UPDATE OR INSERT OR DELETE ON "Rules"
+FOR EACH ROW
+WHEN (pg_trigger_depth() < 1)
+EXECUTE PROCEDURE rules_trigger_setter();
 """
