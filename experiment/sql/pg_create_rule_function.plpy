@@ -1,9 +1,9 @@
-DROP FUNCTION rules.create_rule_function;
-CREATE OR REPLACE FUNCTION rules.create_rule_function(rule_id integer) RETURNS text
+DROP FUNCTION create_rule_function;
+CREATE OR REPLACE FUNCTION create_rule_function(rule_id integer) RETURNS text
 AS $$
     SD['temp_idx'] = 0
     def build_subquery(sid, cached_selections):
-        plan = plpy.prepare("""SELECT * FROM Rules."Selectors" s WHERE s."SID" = $1""", ["integer"])
+        plan = plpy.prepare("""SELECT * FROM "Selectors" s WHERE s."SID" = $1""", ["integer"])
         if sid not in cached_selections:
             result = plan.execute([sid])
             if len(result) == 0:
@@ -21,9 +21,9 @@ AS $$
 
     plan = plpy.prepare("""
         SELECT r."RuleID", "Name", "Description", "Trigger", "CID", "Conjunction", "LeftSID", "Operator", "RightSID"
-        FROM Rules."Rule" r INNER JOIN (
+        FROM "Rule" r INNER JOIN (
             SELECT a."RuleID", a."CID", a."Conjunction", c."LeftSID", c."Operator", c."RightSID"
-            FROM Rules."Actions" a INNER JOIN  Rules."Conditions" c 
+            FROM "Actions" a INNER JOIN  "Conditions" c 
             ON c."CID" = a."CID"
         ) ac ON r."RuleID" = ac."RuleID"
         WHERE r."RuleID" = $1;
@@ -45,17 +45,17 @@ AS $$
         rule_actions_sql.append(result)
     actions_str = " ".join(rule_actions_sql)
     rule_sql = f"""
-    DROP FUNCTION IF EXISTS rules.func_{rule_name};
-    CREATE OR REPLACE FUNCTION rules.func_{rule_name}() RETURNS boolean
+    DROP FUNCTION IF EXISTS func_{rule_name};
+    CREATE OR REPLACE FUNCTION func_{rule_name}() RETURNS boolean
     LANGUAGE SQL
     RETURNS NULL ON NULL INPUT
     RETURN (SELECT TRUE {actions_str});
     """
     plpy.notice(rule_sql)
     plpy.execute(rule_sql)
-    function_name =f'rules.func_{rule_name}'
+    function_name =f'func_{rule_name}'
     return function_name
 
 $$ LANGUAGE plpython3u;
 
--- SELECT rules.create_rule_function(RuleID)
+-- SELECT create_rule_function(RuleID)
