@@ -93,12 +93,13 @@ function LocationBasedComponents() {
             <Typography variant="h6" className={classes.title}>
               UIdaho Grant Management {budgetName && `- ${budgetName}`}
             </Typography>
-            <Button color="inherit">
+            {/* TODO: Finish transactions once database has these */}
+            {/* <Button color="inherit">
               <Link to="/transactions" className={classes.link}>Make Transaction</Link>
             </Button>
             <Button color="inherit">
               <Link to="/list-transactions" className={classes.link}>Transactions</Link>
-            </Button>
+            </Button> */}
             <Button color="inherit">
               <Link to="/users" className={classes.link}>Create Users</Link>
             </Button>
