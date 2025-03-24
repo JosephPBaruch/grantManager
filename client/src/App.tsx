@@ -10,7 +10,7 @@ import CreateBudget from './Components/CreateBudget';
 import Budgets from './Components/Budgets';
 import SignUp from './Components/SignUp';
 import ProtectedRoute from './Components/ProtectedRoute';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const useStyles = makeStyles({
   root: {
@@ -69,12 +69,17 @@ function LocationBasedComponents() {
   const navigate = useNavigate();
   const classes = useStyles();
   const hideHeaderFooter = ['/', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Example state for authentication
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    setIsAuthenticated(!!accessToken);
+  }, [location]);
 
   const handleSignOut = () => {
+    localStorage.removeItem('access_token');
     setIsAuthenticated(false);
-    navigate("/")
-    // Add sign-out logic here
+    navigate("/");
   };
 
   return (
