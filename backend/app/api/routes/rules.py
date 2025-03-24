@@ -1,12 +1,16 @@
+from logging import getLogger
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
+from psycopg.errors import DatabaseError
+from sqlalchemy.exc import DatabaseError as SQL_ERR
 from sqlmodel import func, select
 
 from app.api.deps import SessionDep, TableNamesDep, get_current_active_superuser
 from app.models import Rule, RuleCreate, RulePublic, RulesPublic
 
 router = APIRouter(prefix="/rules", tags=["Rules"])
+logger = getLogger("uvicorn.error")
 
 
 @router.get("/")
@@ -45,10 +49,24 @@ def create_rule(
             status_code=400,
             detail=f"The Table must exist in the database. Valid tables: {table_names}",
         )
-    session.exec(select())
-    session.add(r)
-    session.commit()
-    session.refresh(r)
+    try:
+        session.add(r)
+        session.commit()
+        session.refresh(r)
+    except SQL_ERR as e:
+        driver = e.orig
+        if isinstance(driver, DatabaseError):
+            logger.error(driver)
+            raise HTTPException(
+                status_code=409,
+                detail=driver.diag.message_primary,
+                headers={
+                    "pg_code": driver.sqlstate,
+                    "detail": driver.diag.message_detail,
+                    "primary": driver.diag.message_primary,
+                    "hint": driver.diag.message_hint,
+                },
+            )
     return r
 
 

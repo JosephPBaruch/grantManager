@@ -1,13 +1,16 @@
+from logging import getLogger
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from psycopg2.errors import lookup
+from psycopg.errors import DatabaseError
+from sqlalchemy.exc import DatabaseError as SQL_ERR
 from sqlmodel import func, select
 
 from app.api.deps import SessionDep, get_current_active_superuser
 from app.models import Budget, BudgetBase, BudgetsPublic
 
 router = APIRouter(prefix="/budget", tags=["Budgets"])
+logger = getLogger("uvicorn.error")
 
 
 @router.get(
@@ -29,14 +32,20 @@ def read_budget(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     return BudgetsPublic(data=users, count=count)
 
 
-@router.post("/", response_model=BudgetsPublic)
+@router.post("/", response_model=Budget)
 def create_budget(*, session: SessionDep, rule_create: BudgetBase) -> Budget:
     r = Budget.model_validate(rule_create)
     try:
-        session.exec(select())
         session.add(r)
         session.commit()
         session.refresh(r)
-    except lookup("RSERR") as E:
-        raise HTTPException(status_code=409, detail=E.pgcode)
+    except SQL_ERR as e:
+        driver = e.orig
+        if isinstance(driver, DatabaseError):
+            logger.error(driver)
+            raise HTTPException(
+                status_code=409,
+                detail=driver.diag.message_primary,
+                headers={"pg_code": driver.sqlstate},
+            )
     return r
