@@ -118,6 +118,7 @@ def create_missing_schemas(
     This depends on sqla/alembic to give us all existing
     schemas in the schema_names argument.
     """
+
     used_schemas = set()
     for operations_group in upgrade_ops.ops:
         # We only care about Tables at the top level, so this is enough for us.

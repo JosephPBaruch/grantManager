@@ -23,6 +23,17 @@ AS $$
         plpy.notice(sid, cached_selections[sid], subquery)
         return (cached_selections, subquery)
 
+    result = plpy.prepare(
+        'SELECT a."RuleID", a."CID", a."Conjunction", c."LeftSID", c."Operator", c."RightSID" \
+            FROM "Actions" a INNER JOIN "Conditions" c \
+            ON c."CID" = a."CID" \
+            WHERE r."RuleID" = $1; \
+        ', ["integer"]
+    )
+    result = plan.execute([rule_id])
+    if not len(result):
+        return ''
+
     plan = plpy.prepare(
         'SELECT r."RuleID", "Name", "Description", "Trigger", "CID", "Conjunction", "LeftSID", "Operator", "RightSID" \
         FROM "Rules" r LEFT JOIN ( \
@@ -74,4 +85,3 @@ AS $$
 
 $$ LANGUAGE plpython3u;
 
-SELECT create_rule_function(1)

@@ -1,7 +1,8 @@
 services:
-
   db:
-    image: postgres:12
+    image: '${DOCKER_IMAGE_POSTGRES?Variable not set}:${TAG-latest}'
+    build:
+      context: ./pg
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -12,14 +13,16 @@ services:
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
     env_file:
-      - .env
+      - path: ./.env
+        required: true
     environment:
+      - PGPORT=${POSTGRES_PORT}
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
     ports:
-      - "${POSTGRES_PORT?5432}:${POSTGRES_PORT?5432}"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
 
   prestart:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
