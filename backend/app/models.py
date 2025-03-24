@@ -110,35 +110,61 @@ class RulesPublic(SQLModel):
     count: int
 
 
-class Selectors(SQLModel, table=True):
-    """Selectors Table."""
+class SelectorsBase(SQLModel):
+    """"""
 
-    __tablename__ = "Selectors"
-    SID: Optional[int] = Field(default=None, primary_key=True)
     Table: Optional[str] = Field(default=None, sa_column=Column(TEXT))
     Target: str = Field(sa_column=Column(TEXT))
     Aggregator: str = Field(default="MAX", sa_column=Column(TEXT))
     Type: str = Field(default="int", sa_column=Column(TEXT))
 
 
-class Conditions(SQLModel, table=True):
-    """Conditions Table."""
+class Selectors(SelectorsBase, table=True):
+    """Selectors Table."""
 
-    __tablename__ = "Conditions"
-    CID: Optional[int] = Field(default=None, primary_key=True)
+    __tablename__ = "Selectors"
+    SID: Optional[int] = Field(default=None, primary_key=True)
+
+
+class SelectorsPublic(SQLModel):
+    data: list[Selectors]
+    count: int
+
+
+class ConditionBase(SQLModel):
     LeftSID: int = Field(foreign_key="Selectors.SID")
     Operator: str = Field(sa_column=Column(TEXT))
     RightSID: int = Field(foreign_key="Selectors.SID")
 
 
-class Actions(SQLModel, table=True):
+class Condition(ConditionBase, table=True):
+    """Conditions Table."""
+
+    __tablename__ = "Conditions"
+    CID: Optional[int] = Field(default=None, primary_key=True)
+
+
+class ConditionsPublic(SQLModel):
+    data: list[Condition]
+    count: int
+
+
+class ActionBase(SQLModel):
+    RuleID: int = Field(foreign_key="Rules.RuleID")
+    CID: int = Field(foreign_key="Conditions.CID")
+    Conjunction: str = Field(default="AND", sa_column=Column(TEXT))
+
+
+class Action(ActionBase, table=True):
     """Actions Table."""
 
     __tablename__ = "Actions"
     id: Optional[int] = Field(default=None, primary_key=True)
-    RuleID: int = Field(foreign_key="Rules.RuleID")
-    CID: int = Field(foreign_key="Conditions.CID")
-    Conjunction: str = Field(default="AND", sa_column=Column(TEXT))
+
+
+class ActionsPublic(SQLModel):
+    data: list[Action]
+    count: int
 
 
 class _RulesSystemTables(SQLModel, table=True):
@@ -162,8 +188,13 @@ class BudgetBase(SQLModel):
     amount: float = Field(default=0)
 
 
-class BudgetTable(BudgetBase, table=True):
+class Budget(BudgetBase, table=True):
     """Budget Table Model."""
 
     __tablename__ = "budget"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+
+class BudgetsPublic(SQLModel):
+    data: list[Budget]
+    count: int
