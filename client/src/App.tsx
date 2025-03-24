@@ -1,16 +1,18 @@
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
-import Transactions from './Components/MakeTransactions';
-import ViewTransactions from './Components/ListTransaction';
-import ListUsers from './Components/ListUsers';
-import CreateUser from './Components/CreateUser';
+import Transactions from './Components/Transactions/MakeTransactions';
+import ViewTransactions from './Components/Transactions/ListTransaction';
+import ListUsers from './Components/Users/ListUsers';
+import CreateUser from './Components/Users/CreateUser';
 import { makeStyles } from '@mui/styles';
 import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mui/material';
-import SignIn from './Components/SignIn';
-import CreateBudget from './Components/CreateBudget';
-import Budgets from './Components/Budgets';
-import SignUp from './Components/SignUp';
+import SignIn from './Components/Sign/SignIn';
+import CreateBudget from './Components/Budgets/CreateBudget';
+import Budgets from './Components/Budgets/Budgets';
+import SignUp from './Components/Sign/SignUp';
+import Rules from './Components/Rules/Rules'
 import ProtectedRoute from './Components/ProtectedRoute';
 import { useState, useEffect } from 'react';
+import CreateRules from './Components/Rules/CreateRules';
 
 const useStyles = makeStyles({
   root: {
@@ -100,16 +102,19 @@ function LocationBasedComponents() {
             <Button color="inherit">
               <Link to="/list-transactions" className={classes.link}>Transactions</Link>
             </Button> */}
-            <Button color="inherit">
+            {/* <Button color="inherit">
               <Link to="/users" className={classes.link}>Create Users</Link>
-            </Button>
+            </Button> */}
             <Button color="inherit">
               <Link to="/list-users" className={classes.link}>Users</Link>
             </Button>
             {isAuthenticated && (
               <>
+              <Button color="inherit">
+                  <Link to="/rules" className={classes.link}>Rules</Link>
+                </Button>
                 <Button color="inherit">
-                  <Link to="/budgets" className={classes.link}>Change Budget</Link>
+                  <Link to="/budgets" className={classes.link}>Budget</Link>
                 </Button>
                 <Button color="inherit" onClick={handleSignOut}>
                   Sign Out
@@ -131,6 +136,8 @@ function LocationBasedComponents() {
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/create-budget" element={<ProtectedRoute element={<CreateBudget />} />} />
             <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
+            <Route path="/rules" element={<ProtectedRoute element={<Rules />} />} />
+            <Route path="/create-rules" element={<ProtectedRoute element={<CreateRules />} />} />
           </Routes>
         </div>
         {!hideHeaderFooter && (

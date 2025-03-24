@@ -2,7 +2,7 @@ import { Container, Typography, Paper, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
-import { Budget } from "../types/Budget";
+import { Budget } from "../../types/Budget";
 
 const useStyles = makeStyles({
   root: {

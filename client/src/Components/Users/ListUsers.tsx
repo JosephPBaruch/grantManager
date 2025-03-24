@@ -1,8 +1,9 @@
-import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
 import { Check, Close } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
-import { User } from "../types/User";
+import { User } from "../../types/User";
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
   root: {
@@ -28,6 +29,7 @@ const useStyles = makeStyles({
 function ListUsers() {
   const classes = useStyles();
   const [users, setUsers] = useState<User[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
@@ -58,6 +60,9 @@ function ListUsers() {
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>
+      <Button variant="contained" color="primary" onClick={() => navigate('/users')}>
+        Create User
+      </Button>
       {users.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>

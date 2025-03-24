@@ -1,7 +1,7 @@
 import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
-import { Transaction } from "../types/Transaction";
+import { Transaction } from "../../types/Transaction";
 
 const useStyles = makeStyles({
   root: {
