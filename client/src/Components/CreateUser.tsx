@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Button, TextField, Container, Typography, Checkbox, FormControlLabel } from '@mui/material';
 import { makeStyles } from '@mui/styles';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   form: {
@@ -24,7 +26,6 @@ const CreateUser: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [admin, setAdmin] = useState(false);
-  const [budgetName, setBudgetName] = useState('');
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,7 +53,7 @@ const CreateUser: React.FC = () => {
       body: JSON.stringify(userData),
     }).then((response) => {
       if (response.ok) {
-        console.log('User created!');
+        toast.success('User created successfully!');
       } else {
         console.error('Error creating user:', response.statusText);
       }
@@ -96,14 +97,6 @@ const CreateUser: React.FC = () => {
           required
           className={classes.textField}
         />
-        <TextField
-          label="Budget Name"
-          value={budgetName}
-          onChange={(e) => setBudgetName(e.target.value)}
-          fullWidth
-          margin="normal"
-          className={classes.textField}
-        />
         <FormControlLabel
           control={
             <Checkbox
@@ -118,6 +111,7 @@ const CreateUser: React.FC = () => {
           Create User
         </Button>
       </form>
+      <ToastContainer />
     </Container>
   );
 };
