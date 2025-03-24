@@ -61,6 +61,11 @@ function Budgets() {
     navigate("/create-budget");
   };
 
+  const handleSelectBudget = (id: string) => {
+    localStorage.setItem('selected_budget_id', id);
+    navigate("/list-transactions");
+  };
+
   return (
     <Container maxWidth="sm" className={classes.root}>
         <Typography variant="h4">
@@ -71,7 +76,12 @@ function Budgets() {
       </Typography>
       {budgets.length > 0 ? (
         budgets.map((budget) => (
-          <Paper style={{backgroundColor: "#e0e0e0" }} key={budget.id} className={classes.budgetCard}>
+          <Paper 
+            style={{backgroundColor: "#e0e0e0", cursor: 'pointer' }} 
+            key={budget.id} 
+            className={classes.budgetCard}
+            onClick={() => handleSelectBudget(budget.id)}
+          >
             <div className={classes.budgetInfo}>
               <Typography variant="h6">{budget.name}</Typography>
               <Typography variant="body1">Start Date: {new Date(budget.start_date).toLocaleDateString()}</Typography>
