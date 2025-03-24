@@ -1,9 +1,9 @@
-from fastapi import FastAPI
-from fastapi.routing import APIRoute
-from fastapi.middleware.cors import CORSMiddleware
-
 from app.api.main import api_router
 from app.core.config import settings
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIRoute
+
 
 def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"
@@ -18,6 +18,9 @@ app = FastAPI(
 origins = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:8081/",
+    "http://127.0.0.1:8080",  # Add this line if needed
+    "http://127.0.0.1:8081/",  # Add this line if needed
 ]
 
 app.add_middleware(

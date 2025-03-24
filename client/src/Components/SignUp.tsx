@@ -34,6 +34,7 @@ const SignUp: React.FC = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password, full_name: fullName }),
+      mode: 'no-cors', 
     }).then((response) => {
       if (response.ok) {
         console.log('User signed up!');
