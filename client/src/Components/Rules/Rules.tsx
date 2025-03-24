@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Rule } from '../../types/rules';
+import { Button, CircularProgress, Container, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 const Rules = () => {
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRules = async () => {
@@ -33,41 +36,46 @@ const Rules = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CircularProgress />;
   }
 
   return (
-    <div>
-      <h1>Rules</h1>
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Rules
+      </Typography>
+      <Button variant="contained" color="primary" onClick={() => navigate('/create-rules')}>
+        Create Rule
+      </Button>
       {rules.length === 0 ? (
-        <div>No rules available.</div>
+        <Typography variant="body1">No rules available.</Typography>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Table</th>
-              <th>Enabled</th>
-              <th>RuleID</th>
-              <th>Trigger</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell>Table</TableCell>
+              <TableCell>Enabled</TableCell>
+              <TableCell>RuleID</TableCell>
+              <TableCell>Trigger</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {rules.map(rule => (
-              <tr key={rule.RuleID}>
-                <td>{rule.Name}</td>
-                <td>{rule.Description}</td>
-                <td>{rule.Table}</td>
-                <td>{rule.Enabled ? 'Yes' : 'No'}</td>
-                <td>{rule.RuleID}</td>
-                <td>{rule.Trigger}</td>
-              </tr>
+              <TableRow key={rule.RuleID}>
+                <TableCell>{rule.Name}</TableCell>
+                <TableCell>{rule.Description}</TableCell>
+                <TableCell>{rule.Table}</TableCell>
+                <TableCell>{rule.Enabled ? 'Yes' : 'No'}</TableCell>
+                <TableCell>{rule.RuleID}</TableCell>
+                <TableCell>{rule.Trigger}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
-    </div>
+    </Container>
   );
 };
 
