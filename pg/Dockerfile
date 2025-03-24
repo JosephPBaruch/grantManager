@@ -7,7 +7,7 @@ COPY ./plpython3-enable.sh /docker-entrypoint-initdb.d/plpython3-enable.sh
 
 # Grant Manager Scripting Functions
 COPY ./pg_create_rule_function.plpy /docker-entrypoint-initdb.d/pg_create_rule_function.plpy
-COPY ./add_rule_function.sh /docker-entrypoint-initdb.d/add_rule_function.sh
+# COPY ./add_rule_function.sh /docker-entrypoint-initdb.d/add_rule_function.sh
 
 
 # Removes Windows line endings

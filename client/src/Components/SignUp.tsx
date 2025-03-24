@@ -30,11 +30,10 @@ const SignUp: React.FC = () => {
     event.preventDefault();
     fetch('http://localhost:8000/api/v1/users/signup', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password, full_name: fullName }),
-      mode: 'no-cors', 
+      headers: new Headers({'content-type': 'application/json'}),
+
+      body: JSON.stringify({ "email": email, "password": password, "full_name": fullName }),
+      // mode: 'no-cors', 
     }).then((response) => {
       if (response.ok) {
         console.log('User signed up!');
