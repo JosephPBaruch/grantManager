@@ -2,6 +2,7 @@ import { Container, Typography, Paper, TextField, Button, IconButton } from "@mu
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
 import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
   root: {
@@ -38,14 +39,41 @@ function CreateBudget() {
   const [totalAmount, setTotalAmount] = useState('');
   const [customRules, setCustomRules] = useState<string[]>([]);
   const [newRule, setNewRule] = useState('');
+  const nagivate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle create budget logic her
-    console.log('Budget Name:', budgetName);
-    console.log('End Date:', endDate);
-    console.log('Total Amount:', totalAmount);
-    console.log('Custom Rules:', customRules);
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    const budgetData = {
+      name: budgetName,
+      funding_source: "string", // Replace with actual funding source if available
+      start_date: new Date().toISOString(), // Replace with actual start date if available
+      end_date: new Date(endDate).toISOString(),
+      amount: parseFloat(totalAmount),
+    };
+
+    fetch('http://localhost:8000/api/v1/budget/', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(budgetData),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      nagivate("/list-transactions")
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   };
 
   const handleAddRule = () => {

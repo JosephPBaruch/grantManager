@@ -34,10 +34,12 @@ function Budgets() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8080/api/budgets/', {
+    const token = localStorage.getItem('access_token');
+    fetch('http://localhost:8000/api/v1/budget/?skip=0&limit=100', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
     })
     .then((response) => response.json())
