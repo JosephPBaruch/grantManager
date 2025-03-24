@@ -61,8 +61,9 @@ function Budgets() {
     navigate("/create-budget");
   };
 
-  const handleSelectBudget = (id: string) => {
+  const handleSelectBudget = (id: string, name: string) => {
     localStorage.setItem('selected_budget_id', id);
+    localStorage.setItem('selected_budget_name', name);
     navigate("/list-transactions");
   };
 
@@ -80,7 +81,7 @@ function Budgets() {
             style={{backgroundColor: "#e0e0e0", cursor: 'pointer' }} 
             key={budget.id} 
             className={classes.budgetCard}
-            onClick={() => handleSelectBudget(budget.id)}
+            onClick={() => handleSelectBudget(budget.id, budget.name)}
           >
             <div className={classes.budgetInfo}>
               <Typography variant="h6">{budget.name}</Typography>

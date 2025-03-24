@@ -69,6 +69,8 @@ function CreateBudget() {
     .then(response => response.json())
     .then(data => {
       console.log(data);
+      localStorage.setItem('selected_budget_id', data.id);
+      localStorage.setItem('selected_budget_name', data.name);
       nagivate("/list-transactions")
     })
     .catch((error) => {

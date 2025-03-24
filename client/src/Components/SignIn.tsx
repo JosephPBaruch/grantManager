@@ -2,6 +2,8 @@ import { Container, Typography, Paper, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   root: {
@@ -56,8 +58,10 @@ function SignIn() {
       }
     }).then((data) => {
       localStorage.setItem('access_token', data.access_token);
+      toast.success('Signed in successfully!');
       navigate("/budgets");
     }).catch((error) => {
+      toast.error('Error signing in: ' + error.message);
       console.error('Error signing in:', error);
     });
   };
@@ -105,6 +109,7 @@ function SignIn() {
           Sign Up
         </Button>
       </Paper>
+      <ToastContainer />
     </Container>
   );
 }

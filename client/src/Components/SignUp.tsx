@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, TextField, Container, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   form: {
@@ -37,12 +39,15 @@ const SignUp: React.FC = () => {
     }).then((response) => {
       if (response.ok) {
         console.log('User signed up!');
+        toast.success('Signed up successfully!');
         navigate("/");
       } else {
         console.error('Error signing up:', response.statusText);
+        toast.error('Error signing up: ' + response.statusText);
       }
     }).catch((error) => {
       console.error('Error signing up:', error);
+      toast.error('Error signing up: ' + error.message);
     });
   };
 
@@ -91,6 +96,7 @@ const SignUp: React.FC = () => {
           Sign In
         </Button>
       </form>
+      <ToastContainer />
     </Container>
   );
 };

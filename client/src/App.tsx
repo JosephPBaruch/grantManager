@@ -70,10 +70,13 @@ function LocationBasedComponents() {
   const classes = useStyles();
   const hideHeaderFooter = ['/', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [budgetName, setBudgetName] = useState('');
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     setIsAuthenticated(!!accessToken);
+    const storedBudgetName = localStorage.getItem('selected_budget_name');
+    setBudgetName(storedBudgetName || '');
   }, [location]);
 
   const handleSignOut = () => {
@@ -88,7 +91,7 @@ function LocationBasedComponents() {
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              UIdaho Grant Management
+              UIdaho Grant Management {budgetName && `- ${budgetName}`}
             </Typography>
             <Button color="inherit">
               <Link to="/transactions" className={classes.link}>Make Transaction</Link>
