@@ -1,4 +1,5 @@
 import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Check, Close } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { User } from "../types/User";
@@ -75,8 +76,8 @@ function ListUsers() {
                   <TableCell>{user.full_name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
-                  <TableCell>{user.is_active ? "Yes" : "No"}</TableCell>
-                  <TableCell>{user.is_superuser ? "Yes" : "No"}</TableCell>
+                  <TableCell>{user.is_active ? <Check /> : <Close />}</TableCell>
+                  <TableCell>{user.is_superuser ? <Check /> : <Close />}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
