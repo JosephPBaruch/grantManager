@@ -20,8 +20,7 @@ const useStyles = makeStyles({
 
 const CreateUser: React.FC = () => {
   const classes = useStyles();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [admin, setAdmin] = useState(false);
@@ -29,12 +28,28 @@ const CreateUser: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    fetch('http://127.0.0.1:8080/api/users/', {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    const userData = {
+      email,
+      is_active: true,
+      is_superuser: admin,
+      full_name: fullName,
+      password,
+    };
+
+    fetch('http://localhost:8000/api/v1/users/', {
       method: 'POST',
       headers: {
+        'accept': 'application/json',
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password, admin, budgetName }),
+      body: JSON.stringify(userData),
     }).then((response) => {
       if (response.ok) {
         console.log('User created!');
@@ -53,18 +68,9 @@ const CreateUser: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit} className={classes.form}>
         <TextField
-          label="First Name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-          className={classes.textField}
-        />
-        <TextField
-          label="Last Name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          label="Full Name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           fullWidth
           margin="normal"
           required

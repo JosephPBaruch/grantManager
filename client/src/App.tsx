@@ -100,7 +100,7 @@ function LocationBasedComponents() {
             {isAuthenticated && (
               <>
                 <Button color="inherit">
-                  <Link to="/create-budget" className={classes.link}>Change Budget</Link>
+                  <Link to="/budgets" className={classes.link}>Change Budget</Link>
                 </Button>
                 <Button color="inherit" onClick={handleSignOut}>
                   Sign Out

@@ -29,10 +29,17 @@ function ListUsers() {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8080/api/users/', {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    fetch('http://localhost:8000/api/v1/users/?skip=0&limit=100', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
       },
     })
     .then((response) => response.json())
@@ -49,17 +56,21 @@ function ListUsers() {
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>
-      {users.map((user) => (
-        <Paper style={{backgroundColor: "#e0e0e0" }} key={user.id} className={classes.userCard}>
-          <div className={classes.userInfo}>
-            <Typography variant="h6">{user.first_name} {user.last_name}</Typography>
-            <Typography variant="body1">{user.email}</Typography>
-            <Typography variant="body2">{new Date(user.created_at).toLocaleString()}</Typography>
-            <Typography variant="body2">Admin: {user.admin ? "Yes" : "No"}</Typography>
-            <Typography variant="body2">Budget Name: {user.budgetName}</Typography>
-          </div>
-        </Paper>
-      ))}
+      {users.length > 0 ? (
+        users.map((user) => (
+          <Paper style={{backgroundColor: "#e0e0e0" }} key={user.id} className={classes.userCard}>
+            <div className={classes.userInfo}>
+              <Typography variant="h6">{user.first_name} {user.last_name}</Typography>
+              <Typography variant="body1">{user.email}</Typography>
+              <Typography variant="body2">{new Date(user.created_at).toLocaleString()}</Typography>
+              <Typography variant="body2">Admin: {user.admin ? "Yes" : "No"}</Typography>
+              <Typography variant="body2">Budget Name: {user.budgetName}</Typography>
+            </div>
+          </Paper>
+        ))
+      ) : (
+        <Typography variant="body1">No users found.</Typography>
+      )}
     </Container>
   );
 }
