@@ -1,7 +1,8 @@
 export interface Budget {
-  id: number;
+  id: string;
   name: string;
-  endDate: string;
-  totalAmount: number;
-  rules: string[];
+  start_date: string;
+  end_date: string;
+  amount: number;
+  funding_source: string;
 }

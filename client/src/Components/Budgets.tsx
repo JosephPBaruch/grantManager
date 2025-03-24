@@ -44,7 +44,13 @@ function Budgets() {
     })
     .then((response) => response.json())
     .then((data) => {
-      setBudgets(data);
+      // console.log(data.data);
+      if (data.data && Array.isArray(data.data)) {
+        setBudgets(data.data);
+      } else {
+        console.error('Unexpected data format:', data);
+        setBudgets([]);
+      }
     })
     .catch((error) => {
       console.error('Error fetching budgets:', error);
@@ -68,9 +74,10 @@ function Budgets() {
           <Paper style={{backgroundColor: "#e0e0e0" }} key={budget.id} className={classes.budgetCard}>
             <div className={classes.budgetInfo}>
               <Typography variant="h6">{budget.name}</Typography>
-              <Typography variant="body1">End Date: {new Date(budget.endDate).toLocaleDateString()}</Typography>
-              <Typography variant="body1">Total Amount: ${budget.totalAmount}</Typography>
-              <Typography variant="body2">Rules: {budget.rules.join(', ')}</Typography>
+              <Typography variant="body1">Start Date: {new Date(budget.start_date).toLocaleDateString()}</Typography>
+              <Typography variant="body1">End Date: {new Date(budget.end_date).toLocaleDateString()}</Typography>
+              <Typography variant="body1">Total Amount: ${budget.amount}</Typography>
+              <Typography variant="body2">Funding Source: {budget.funding_source}</Typography>
             </div>
           </Paper>
         ))
