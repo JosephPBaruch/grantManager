@@ -11,6 +11,9 @@ const CreateRules = () => {
   const [table, setTable] = useState('');
   const [enabled, setEnabled] = useState(true);
   const [actions, setActions] = useState<Action[]>([]);
+  const [ruleID, setRuleID] = useState(0);
+  const [cid, setCID] = useState(0);
+  const [conjunction, setConjunction] = useState('AND');
 
   useEffect(() => {
     const fetchActions = async () => {
@@ -36,7 +39,7 @@ const CreateRules = () => {
 
   const handleSubmit = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/api/v1/rules/', {
+    const response = await fetch('http://localhost:8000/api/v1/rules/actions', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
@@ -55,6 +58,30 @@ const CreateRules = () => {
       navigate('/rules');
     } else {
       console.error('Failed to create rule');
+    }
+  };
+
+  const handleCreateAction = async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8000/api/v1/rules/actions/', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        RuleID: ruleID,
+        CID: cid,
+        Conjunction: conjunction
+      })
+    });
+
+    if (response.ok) {
+      const newAction: Action = await response.json();
+      setActions([...actions, newAction]);
+    } else {
+      console.error('Failed to create action');
     }
   };
 
@@ -133,6 +160,32 @@ const CreateRules = () => {
           ) : (
             <Typography>No actions available</Typography>
           )}
+          <form>
+            <TextField
+              label="RuleID"
+              value={ruleID}
+              onChange={(e) => setRuleID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="CID"
+              value={cid}
+              onChange={(e) => setCID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Conjunction"
+              value={conjunction}
+              onChange={(e) => setConjunction(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={handleCreateAction}>
+              Create Action
+            </Button>
+          </form>
         </AccordionDetails>
       </Accordion>
       <Accordion>
