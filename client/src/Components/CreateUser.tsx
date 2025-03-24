@@ -55,9 +55,11 @@ const CreateUser: React.FC = () => {
       if (response.ok) {
         toast.success('User created successfully!');
       } else {
+        toast.error('Error creating user: ' + response.statusText);
         console.error('Error creating user:', response.statusText);
       }
     }).catch((error) => {
+      toast.error('Error creating user: ' + error.message);
       console.error('Error creating user:', error);
     });
   };
