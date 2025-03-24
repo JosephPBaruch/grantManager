@@ -1,4 +1,4 @@
-import { Container, Typography, Paper } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { User } from "../types/User";
@@ -44,7 +44,8 @@ function ListUsers() {
     })
     .then((response) => response.json())
     .then((data) => {
-      setUsers(data);
+      console.log(data.data);
+      setUsers(data.data);
     })
     .catch((error) => {
       console.error('Error fetching users:', error);
@@ -57,17 +58,30 @@ function ListUsers() {
         Users
       </Typography>
       {users.length > 0 ? (
-        users.map((user) => (
-          <Paper style={{backgroundColor: "#e0e0e0" }} key={user.id} className={classes.userCard}>
-            <div className={classes.userInfo}>
-              <Typography variant="h6">{user.first_name} {user.last_name}</Typography>
-              <Typography variant="body1">{user.email}</Typography>
-              <Typography variant="body2">{new Date(user.created_at).toLocaleString()}</Typography>
-              <Typography variant="body2">Admin: {user.admin ? "Yes" : "No"}</Typography>
-              <Typography variant="body2">Budget Name: {user.budgetName}</Typography>
-            </div>
-          </Paper>
-        ))
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Full Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Created At</TableCell>
+                <TableCell>Active</TableCell>
+                <TableCell>Superuser</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>{user.full_name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
+                  <TableCell>{user.is_active ? "Yes" : "No"}</TableCell>
+                  <TableCell>{user.is_superuser ? "Yes" : "No"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : (
         <Typography variant="body1">No users found.</Typography>
       )}
