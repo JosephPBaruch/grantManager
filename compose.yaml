@@ -13,8 +13,7 @@ services:
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
     env_file:
-      - path: ./.env
-        required: true
+      - .env
     environment:
       - PGPORT=${POSTGRES_PORT}
       - PGDATA=/var/lib/postgresql/data/pgdata
