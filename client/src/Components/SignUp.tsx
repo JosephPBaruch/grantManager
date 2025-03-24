@@ -87,6 +87,9 @@ const SignUp: React.FC = () => {
         <Button type="submit" variant="contained" color="primary" fullWidth className={classes.button}>
           Sign Up
         </Button>
+        <Button variant="outlined" color="secondary" fullWidth className={classes.button} onClick={() => navigate("/")}>
+          Sign In
+        </Button>
       </form>
     </Container>
   );

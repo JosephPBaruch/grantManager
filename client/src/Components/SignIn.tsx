@@ -34,8 +34,32 @@ function SignIn() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Fetch Here
-    navigate("/budgets")
+    fetch('http://localhost:8000/api/v1/login/access-token', {
+      method: 'POST',
+      headers: new Headers({
+        'accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }),
+      body: new URLSearchParams({
+        "grant_type": "password",
+        "username": email,
+        "password": password,
+        "scope": "",
+        "client_id": "",
+        "client_secret": ""
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Error signing in: ' + response.statusText);
+      }
+    }).then((data) => {
+      localStorage.setItem('access_token', data.access_token);
+      navigate("/budgets");
+    }).catch((error) => {
+      console.error('Error signing in:', error);
+    });
   };
 
   return (
@@ -71,6 +95,14 @@ function SignIn() {
           className={classes.submitButton}
         >
           Sign In
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          className={classes.submitButton}
+          onClick={() => navigate("/sign-up")}
+        >
+          Sign Up
         </Button>
       </Paper>
     </Container>

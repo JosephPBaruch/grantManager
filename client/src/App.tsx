@@ -33,10 +33,10 @@ const useStyles = makeStyles({
     textDecoration: 'none',
     marginRight: '15px',
     '&:hover': {
-      color: '#ffcc00', // Change to desired hover color
+      color: '#ffcc00', 
     },
     '&:active': {
-      color: '#ff9900', // Change to desired active color
+      color: '#ff9900', 
     },
   },
   title: { 
