@@ -86,6 +86,9 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - SENTRY_DSN=${SENTRY_DSN}
 
+    volumes:
+      - ./backend/app:/app/app
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
       interval: 10s
@@ -94,6 +97,8 @@ services:
 
     build:
       context: ./backend
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
 
 volumes:
   app-db-data:

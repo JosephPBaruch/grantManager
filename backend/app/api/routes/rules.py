@@ -1,9 +1,10 @@
 from typing import Any
 
-from app.api.deps import SessionDep, TableNamesDep, get_current_active_superuser
-from app.models import Rule, RuleCreate, RulePublic, RulesPublic
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import func, select
+
+from app.api.deps import SessionDep, TableNamesDep, get_current_active_superuser
+from app.models import Rule, RuleCreate, RulePublic, RulesPublic
 
 router = APIRouter(prefix="/rules", tags=["Rules"])
 
@@ -49,3 +50,6 @@ def create_rule(
     session.commit()
     session.refresh(r)
     return r
+
+
+# END

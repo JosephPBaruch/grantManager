@@ -1,4 +1,6 @@
-FROM python:3.10
+ARG ENVIRONMENT="local"
+
+FROM python:3.10 AS base
 
 ENV PYTHONUNBUFFERED=1
 
@@ -33,11 +35,28 @@ COPY ./scripts /app/scripts
 
 COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 
+FROM base AS local_build
+
 COPY ./app /app/app
 
 # Sync the project
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
+
+FROM base AS production_build
+# Sync the project
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
+
+
+FROM base AS staging_build
+# Sync the project
+# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
+
+FROM ${ENVIRONMENT}_build AS final
 
 CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
