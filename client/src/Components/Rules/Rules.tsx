@@ -19,8 +19,10 @@ const Rules = () => {
           }
         });
         const data = await response.json();
-        if (data && data.data) {
-          setRules(data.data);
+        console.log(data)
+        if (data) {
+          console.log(data.data)
+          setRules(data);
         } else {
           setRules([]);
         }

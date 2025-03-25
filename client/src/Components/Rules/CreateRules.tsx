@@ -37,8 +37,8 @@ const CreateRules = () => {
       });
 
       const data: RulesResponse = await response.json();
-      if (data && data.data) {
-        setRules(data.data);
+      if (data) {
+        setRules(data);
       } else {
         setRules([]);
       }
@@ -60,8 +60,8 @@ const CreateRules = () => {
       });
 
       const data: ActionsResponse = await response.json();
-      if (data && data.data) {
-        setActions(data.data);
+      if (data) {
+        setActions(data);
       } else {
         setActions([]);
       }
@@ -321,122 +321,6 @@ const CreateRules = () => {
           </Button>
         </AccordionDetails>
       </Accordion>
-      <Accordion onChange={() => fetchActions()}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Actions</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {actions.length > 0 ? (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>RuleID</TableCell>
-                  <TableCell>CID</TableCell>
-                  <TableCell>Conjunction</TableCell>
-                  <TableCell>ID</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {actions.map((action) => (
-                  <TableRow key={action.id}>
-                    <TableCell>{action.RuleID}</TableCell>
-                    <TableCell>{action.CID}</TableCell>
-                    <TableCell>{action.Conjunction}</TableCell>
-                    <TableCell>{action.id}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <Typography>No actions available</Typography>
-          )}
-          <form>
-            <TextField
-              label="RuleID"
-              value={ruleID}
-              onChange={(e) => setRuleID(Number(e.target.value))}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="CID"
-              value={cid}
-              onChange={(e) => setCID(Number(e.target.value))}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Conjunction"
-              value={conjunction}
-              onChange={(e) => setConjunction(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <Button variant="contained" color="primary" onClick={handleCreateAction}>
-              Create Action
-            </Button>
-          </form>
-        </AccordionDetails>
-      </Accordion>
-      <Accordion onChange={() => fetchConditions()}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>Conditions</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          {conditions.length > 0 ? (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ConditionID</TableCell>
-                  <TableCell>RuleID</TableCell>
-                  <TableCell>LeftSID</TableCell>
-                  <TableCell>Operator</TableCell>
-                  <TableCell>RightSID</TableCell>
-                  <TableCell>CID</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {conditions.map((condition) => (
-                  <TableRow key={condition.CID}>
-                    <TableCell>{condition.LeftSID}</TableCell>
-                    <TableCell>{condition.Operator}</TableCell>
-                    <TableCell>{condition.RightSID}</TableCell>
-                    <TableCell>{condition.CID}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <Typography>No conditions available</Typography>
-          )}
-          <form>
-            <TextField
-              label="LeftSID"
-              value={leftSID}
-              onChange={(e) => setLeftSID(Number(e.target.value))}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Operator"
-              value={operator}
-              onChange={(e) => setOperator(e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="RightSID"
-              value={rightSID}
-              onChange={(e) => setRightSID(Number(e.target.value))}
-              fullWidth
-              margin="normal"
-            />
-            <Button variant="contained" color="primary" onClick={handleCreateCondition}>
-              Create Condition
-            </Button>
-          </form>
-        </AccordionDetails>
-      </Accordion>
       <Accordion onChange={() => fetchSelectors}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Selectors</Typography>
@@ -499,6 +383,123 @@ const CreateRules = () => {
             />
             <Button variant="contained" color="primary" onClick={handleCreateSelector}>
               Create Selector
+            </Button>
+          </form>
+        </AccordionDetails>
+      </Accordion>
+     
+      <Accordion onChange={() => fetchConditions()}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Conditions</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {conditions.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ConditionID</TableCell>
+                  <TableCell>RuleID</TableCell>
+                  <TableCell>LeftSID</TableCell>
+                  <TableCell>Operator</TableCell>
+                  <TableCell>RightSID</TableCell>
+                  <TableCell>CID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {conditions.map((condition) => (
+                  <TableRow key={condition.CID}>
+                    <TableCell>{condition.LeftSID}</TableCell>
+                    <TableCell>{condition.Operator}</TableCell>
+                    <TableCell>{condition.RightSID}</TableCell>
+                    <TableCell>{condition.CID}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <Typography>No conditions available</Typography>
+          )}
+          <form>
+            <TextField
+              label="LeftSID"
+              value={leftSID}
+              onChange={(e) => setLeftSID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Operator"
+              value={operator}
+              onChange={(e) => setOperator(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="RightSID"
+              value={rightSID}
+              onChange={(e) => setRightSID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={handleCreateCondition}>
+              Create Condition
+            </Button>
+          </form>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion onChange={() => fetchActions()}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography>Actions</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          {actions.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>RuleID</TableCell>
+                  <TableCell>CID</TableCell>
+                  <TableCell>Conjunction</TableCell>
+                  <TableCell>ID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {actions.map((action) => (
+                  <TableRow key={action.id}>
+                    <TableCell>{action.RuleID}</TableCell>
+                    <TableCell>{action.CID}</TableCell>
+                    <TableCell>{action.Conjunction}</TableCell>
+                    <TableCell>{action.id}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <Typography>No actions available</Typography>
+          )}
+          <form>
+            <TextField
+              label="RuleID"
+              value={ruleID}
+              onChange={(e) => setRuleID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="CID"
+              value={cid}
+              onChange={(e) => setCID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Conjunction"
+              value={conjunction}
+              onChange={(e) => setConjunction(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={handleCreateAction}>
+              Create Action
             </Button>
           </form>
         </AccordionDetails>

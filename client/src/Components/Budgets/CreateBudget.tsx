@@ -71,7 +71,7 @@ function CreateBudget() {
       console.log(data);
       localStorage.setItem('selected_budget_id', data.id);
       localStorage.setItem('selected_budget_name', data.name);
-      nagivate("/list-transactions")
+      nagivate("/list-users")
     })
     .catch((error) => {
       console.error('Error:', error);
