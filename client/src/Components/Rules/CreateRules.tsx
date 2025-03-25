@@ -131,106 +131,126 @@ const CreateRules = () => {
 
   const handleSubmit = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/api/v1/rules/', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        Name: name,
-        Description: description,
-        Table: table,
-        Enabled: enabled
-      })
-    });
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          Name: name,
+          Description: description,
+          Table: table,
+          Enabled: enabled
+        })
+      });
 
-    if (response.ok) {
-      toast.success('Rule created successfully');
-      navigate('/rules');
-    } else {
-      toast.error('Failed to create rule');
-      console.error('Failed to create rule');
+      if (response.ok) {
+        toast.success('Rule created successfully');
+        navigate('/rules');
+      } else {
+        toast.error('Failed to create rule');
+        console.error('Failed to create rule');
+      }
+    } catch (error) {
+      toast.error('An error occurred while creating the rule');
+      console.error('An error occurred while creating the rule:', error);
     }
   };
 
   const handleCreateAction = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/api/v1/rules/actions/', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        RuleID: ruleID,
-        CID: cid,
-        Conjunction: conjunction
-      })
-    });
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/actions/', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          RuleID: ruleID,
+          CID: cid,
+          Conjunction: conjunction
+        })
+      });
 
-    if (response.ok) {
-      const newAction: Action = await response.json();
-      setActions([...actions, newAction]);
-      toast.success('Action created successfully');
-    } else {
-      toast.error('Failed to create action');
-      console.error('Failed to create action');
+      if (response.ok) {
+        const newAction: Action = await response.json();
+        setActions([...actions, newAction]);
+        toast.success('Action created successfully');
+      } else {
+        toast.error('Failed to create action');
+        console.error('Failed to create action');
+      }
+    } catch (error) {
+      toast.error('An error occurred while creating the action');
+      console.error('An error occurred while creating the action:', error);
     }
   };
 
   const handleCreateCondition = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/api/v1/rules/conditions/', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        LeftSID: leftSID,
-        Operator: operator,
-        RightSID: rightSID
-      })
-    });
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/conditions/', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          LeftSID: leftSID,
+          Operator: operator,
+          RightSID: rightSID
+        })
+      });
 
-    if (response.ok) {
-      const newCondition: Condition = await response.json();
-      setConditions([...conditions, newCondition]);
-      toast.success('Condition created successfully');
-    } else {
-      toast.error('Failed to create condition');
-      console.error('Failed to create condition');
+      if (response.ok) {
+        const newCondition: Condition = await response.json();
+        setConditions([...conditions, newCondition]);
+        toast.success('Condition created successfully');
+      } else {
+        toast.error('Failed to create condition');
+        console.error('Failed to create condition');
+      }
+    } catch (error) {
+      toast.error('An error occurred while creating the condition');
+      console.error('An error occurred while creating the condition:', error);
     }
   };
 
   const handleCreateSelector = async () => {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:8000/api/v1/rules/selectors/', {
-      method: 'POST',
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        Table: selectorTable,
-        Target: target,
-        Aggregator: aggregator,
-        Type: type
-      })
-    });
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/selectors/', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          Table: selectorTable,
+          Target: target,
+          Aggregator: aggregator,
+          Type: type
+        })
+      });
 
-    if (response.ok) {
-      const newSelector: Selector = await response.json();
-      setSelectors([...selectors, newSelector]);
-      toast.success('Selector created successfully');
-    } else {
-      toast.error('Failed to create selector');
-      console.error('Failed to create selector');
+      if (response.ok) {
+        const newSelector: Selector = await response.json();
+        setSelectors([...selectors, newSelector]);
+        toast.success('Selector created successfully');
+      } else {
+        toast.error('Failed to create selector');
+        console.error('Failed to create selector');
+      }
+    } catch (error) {
+      toast.error('An error occurred while creating the selector');
+      console.error('An error occurred while creating the selector:', error);
     }
   };
 
