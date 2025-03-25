@@ -2,7 +2,7 @@ import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, B
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Action, ActionsResponse, Rule, RulesResponse } from '../../types/rules';
+import { Action, ActionsResponse, Rule, RulesResponse, Condition, ConditionsResponse } from '../../types/rules';
 
 const CreateRules = () => {
   const navigate = useNavigate();
@@ -12,6 +12,7 @@ const CreateRules = () => {
   const [enabled, setEnabled] = useState(true);
   const [actions, setActions] = useState<Action[]>([]);
   const [rules, setRules] = useState<Rule[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
   const [ruleID, setRuleID] = useState(0);
   const [cid, setCID] = useState(0);
   const [conjunction, setConjunction] = useState('AND');
@@ -66,8 +67,32 @@ const CreateRules = () => {
       }
     };
 
+    const fetchConditions = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/rules/conditions/?skip=0&limit=100', {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data: ConditionsResponse = await response.json();
+        if (data && data.data) {
+          setConditions(data.data);
+        } else {
+          setConditions([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch conditions:', error);
+        setConditions([]);
+      }
+    };
+
     fetchRules();
     fetchActions();
+    fetchConditions();
   }, []);
 
   const handleSubmit = async () => {
@@ -259,9 +284,32 @@ const CreateRules = () => {
           <Typography>Conditions</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Details about Rule 2.
-          </Typography>
+          {conditions.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>ConditionID</TableCell>
+                  <TableCell>RuleID</TableCell>
+                  <TableCell>LeftSID</TableCell>
+                  <TableCell>Operator</TableCell>
+                  <TableCell>RightSID</TableCell>
+                  <TableCell>CID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {conditions.map((condition) => (
+                  <TableRow key={condition.CID}>
+                    <TableCell>{condition.LeftSID}</TableCell>
+                    <TableCell>{condition.Operator}</TableCell>
+                    <TableCell>{condition.RightSID}</TableCell>
+                    <TableCell>{condition.CID}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <Typography>No conditions available</Typography>
+          )}
         </AccordionDetails>
       </Accordion>
       <Accordion>

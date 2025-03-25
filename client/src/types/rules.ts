@@ -23,3 +23,15 @@ export interface ActionsResponse {
   data: Action[];
   count: number;
 }
+
+export interface Condition {
+  LeftSID: number;
+  Operator: string;
+  RightSID: number;
+  CID: number;
+}
+
+export interface ConditionsResponse {
+  data: Condition[];
+  count: number;
+}
