@@ -2,7 +2,7 @@ import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, B
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Action, ActionsResponse, Rule, RulesResponse, Condition, ConditionsResponse } from '../../types/rules';
+import { Action, ActionsResponse, Rule, RulesResponse, Condition, ConditionsResponse, Selector, SelectorsResponse } from '../../types/rules';
 
 const CreateRules = () => {
   const navigate = useNavigate();
@@ -13,9 +13,13 @@ const CreateRules = () => {
   const [actions, setActions] = useState<Action[]>([]);
   const [rules, setRules] = useState<Rule[]>([]);
   const [conditions, setConditions] = useState<Condition[]>([]);
+  const [selectors, setSelectors] = useState<Selector[]>([]);
   const [ruleID, setRuleID] = useState(0);
   const [cid, setCID] = useState(0);
   const [conjunction, setConjunction] = useState('AND');
+  const [leftSID, setLeftSID] = useState(0);
+  const [operator, setOperator] = useState('');
+  const [rightSID, setRightSID] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -90,9 +94,33 @@ const CreateRules = () => {
       }
     };
 
+    const fetchSelectors = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/rules/selectors/?skip=0&limit=100', {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data: SelectorsResponse = await response.json();
+        if (data && data.data) {
+          setSelectors(data.data);
+        } else {
+          setSelectors([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch selectors:', error);
+        setSelectors([]);
+      }
+    };
+
     fetchRules();
     fetchActions();
     fetchConditions();
+    fetchSelectors();
   }, []);
 
   const handleSubmit = async () => {
@@ -140,6 +168,30 @@ const CreateRules = () => {
       setActions([...actions, newAction]);
     } else {
       console.error('Failed to create action');
+    }
+  };
+
+  const handleCreateCondition = async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8000/api/v1/rules/conditions/', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        LeftSID: leftSID,
+        Operator: operator,
+        RightSID: rightSID
+      })
+    });
+
+    if (response.ok) {
+      const newCondition: Condition = await response.json();
+      setConditions([...conditions, newCondition]);
+    } else {
+      console.error('Failed to create condition');
     }
   };
 
@@ -310,6 +362,32 @@ const CreateRules = () => {
           ) : (
             <Typography>No conditions available</Typography>
           )}
+          <form>
+            <TextField
+              label="LeftSID"
+              value={leftSID}
+              onChange={(e) => setLeftSID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Operator"
+              value={operator}
+              onChange={(e) => setOperator(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="RightSID"
+              value={rightSID}
+              onChange={(e) => setRightSID(Number(e.target.value))}
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={handleCreateCondition}>
+              Create Condition
+            </Button>
+          </form>
         </AccordionDetails>
       </Accordion>
       <Accordion>
@@ -317,9 +395,32 @@ const CreateRules = () => {
           <Typography>Selectors</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Details about Rule 3.
-          </Typography>
+          {selectors.length > 0 ? (
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Table</TableCell>
+                  <TableCell>Target</TableCell>
+                  <TableCell>Aggregator</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>SID</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {selectors.map((selector) => (
+                  <TableRow key={selector.SID}>
+                    <TableCell>{selector.Table}</TableCell>
+                    <TableCell>{selector.Target}</TableCell>
+                    <TableCell>{selector.Aggregator}</TableCell>
+                    <TableCell>{selector.Type}</TableCell>
+                    <TableCell>{selector.SID}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <Typography>No selectors available</Typography>
+          )}
         </AccordionDetails>
       </Accordion>
       <Button variant="contained" color="primary" onClick={handleSubmit}>

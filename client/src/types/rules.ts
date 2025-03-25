@@ -35,3 +35,16 @@ export interface ConditionsResponse {
   data: Condition[];
   count: number;
 }
+
+export interface Selector {
+  Table: string;
+  Target: string;
+  Aggregator: string;
+  Type: string;
+  SID: number;
+}
+
+export interface SelectorsResponse {
+  data: Selector[];
+  count: number;
+}
