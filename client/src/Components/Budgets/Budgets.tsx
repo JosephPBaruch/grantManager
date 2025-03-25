@@ -64,7 +64,7 @@ function Budgets() {
   const handleSelectBudget = (id: string, name: string) => {
     localStorage.setItem('selected_budget_id', id);
     localStorage.setItem('selected_budget_name', name);
-    navigate("/list-transactions");
+    navigate("/list-users");
   };
 
   return (

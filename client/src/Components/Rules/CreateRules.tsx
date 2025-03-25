@@ -3,6 +3,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Action, ActionsResponse, Rule, RulesResponse, Condition, ConditionsResponse, Selector, SelectorsResponse } from '../../types/rules';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const CreateRules = () => {
   const navigate = useNavigate();
@@ -145,8 +147,10 @@ const CreateRules = () => {
     });
 
     if (response.ok) {
+      toast.success('Rule created successfully');
       navigate('/rules');
     } else {
+      toast.error('Failed to create rule');
       console.error('Failed to create rule');
     }
   };
@@ -170,7 +174,9 @@ const CreateRules = () => {
     if (response.ok) {
       const newAction: Action = await response.json();
       setActions([...actions, newAction]);
+      toast.success('Action created successfully');
     } else {
+      toast.error('Failed to create action');
       console.error('Failed to create action');
     }
   };
@@ -194,7 +200,9 @@ const CreateRules = () => {
     if (response.ok) {
       const newCondition: Condition = await response.json();
       setConditions([...conditions, newCondition]);
+      toast.success('Condition created successfully');
     } else {
+      toast.error('Failed to create condition');
       console.error('Failed to create condition');
     }
   };
@@ -219,7 +227,9 @@ const CreateRules = () => {
     if (response.ok) {
       const newSelector: Selector = await response.json();
       setSelectors([...selectors, newSelector]);
+      toast.success('Selector created successfully');
     } else {
+      toast.error('Failed to create selector');
       console.error('Failed to create selector');
     }
   };
@@ -230,6 +240,7 @@ const CreateRules = () => {
 
   return (
     <Container maxWidth="md">
+      <ToastContainer />
       <Typography variant="h4" component="h1" gutterBottom>
         Create Rule
       </Typography>
