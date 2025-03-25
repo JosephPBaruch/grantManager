@@ -20,6 +20,10 @@ const CreateRules = () => {
   const [leftSID, setLeftSID] = useState(0);
   const [operator, setOperator] = useState('');
   const [rightSID, setRightSID] = useState(0);
+  const [selectorTable, setSelectorTable] = useState('');
+  const [target, setTarget] = useState('');
+  const [aggregator, setAggregator] = useState('MAX');
+  const [type, setType] = useState('int');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -192,6 +196,31 @@ const CreateRules = () => {
       setConditions([...conditions, newCondition]);
     } else {
       console.error('Failed to create condition');
+    }
+  };
+
+  const handleCreateSelector = async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:8000/api/v1/rules/selectors/', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        Table: selectorTable,
+        Target: target,
+        Aggregator: aggregator,
+        Type: type
+      })
+    });
+
+    if (response.ok) {
+      const newSelector: Selector = await response.json();
+      setSelectors([...selectors, newSelector]);
+    } else {
+      console.error('Failed to create selector');
     }
   };
 
@@ -421,11 +450,44 @@ const CreateRules = () => {
           ) : (
             <Typography>No selectors available</Typography>
           )}
+          <form>
+            <TextField
+              label="Table"
+              value={selectorTable}
+              onChange={(e) => setSelectorTable(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Target"
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Aggregator"
+              value={aggregator}
+              onChange={(e) => setAggregator(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" onClick={handleCreateSelector}>
+              Create Selector
+            </Button>
+          </form>
         </AccordionDetails>
       </Accordion>
-      <Button variant="contained" color="primary" onClick={handleSubmit}>
+      {/* <Button variant="contained" color="primary" onClick={handleSubmit}>
         Submit
-      </Button>
+      </Button> */}
     </Container>
   );
 }
