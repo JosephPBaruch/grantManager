@@ -1,13 +1,11 @@
-import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, Button, TextField, Table, TableBody, TableCell, TableHead, TableRow, CircularProgress } from '@mui/material';
+import { Container, Typography, Accordion, AccordionSummary, AccordionDetails, Button, TextField, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState} from 'react';
 import { Action, ActionsResponse, Rule, RulesResponse, Condition, ConditionsResponse, Selector, SelectorsResponse } from '../../types/rules';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const CreateRules = () => {
-  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [table, setTable] = useState('');
@@ -26,108 +24,98 @@ const CreateRules = () => {
   const [target, setTarget] = useState('');
   const [aggregator, setAggregator] = useState('MAX');
   const [type, setType] = useState('int');
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchRules = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/?skip=0&limit=100', {
-          method: 'GET',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data: RulesResponse = await response.json();
-        if (data && data.data) {
-          setRules(data.data);
-        } else {
-          setRules([]);
+  const fetchRules = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/?skip=0&limit=100', {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error('Failed to fetch rules:', error);
+      });
+
+      const data: RulesResponse = await response.json();
+      if (data && data.data) {
+        setRules(data.data);
+      } else {
         setRules([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch rules:', error);
+      setRules([]);
+    } 
+  };
 
-    const fetchActions = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/actions/?skip=0&limit=100', {
-          method: 'GET',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data: ActionsResponse = await response.json();
-        if (data && data.data) {
-          setActions(data.data);
-        } else {
-          setActions([]);
+  const fetchActions = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/actions/?skip=0&limit=100', {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error('Failed to fetch actions:', error);
+      });
+
+      const data: ActionsResponse = await response.json();
+      if (data && data.data) {
+        setActions(data.data);
+      } else {
         setActions([]);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch actions:', error);
+      setActions([]);
+    }
+  };
 
-    const fetchConditions = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/conditions/?skip=0&limit=100', {
-          method: 'GET',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data: ConditionsResponse = await response.json();
-        if (data && data.data) {
-          setConditions(data.data);
-        } else {
-          setConditions([]);
+  const fetchConditions = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/conditions/?skip=0&limit=100', {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error('Failed to fetch conditions:', error);
+      });
+
+      const data: ConditionsResponse = await response.json();
+      if (data && data.data) {
+        setConditions(data.data);
+      } else {
         setConditions([]);
       }
-    };
+    } catch (error) {
+      console.error('Failed to fetch conditions:', error);
+      setConditions([]);
+    }
+  };
 
-    const fetchSelectors = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/selectors/?skip=0&limit=100', {
-          method: 'GET',
-          headers: {
-            'accept': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        const data: SelectorsResponse = await response.json();
-        if (data && data.data) {
-          setSelectors(data.data);
-        } else {
-          setSelectors([]);
+  const fetchSelectors = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/rules/selectors/?skip=0&limit=100', {
+        method: 'GET',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-      } catch (error) {
-        console.error('Failed to fetch selectors:', error);
+      });
+
+      const data: SelectorsResponse = await response.json();
+      if (data && data.data) {
+        setSelectors(data.data);
+      } else {
         setSelectors([]);
       }
-    };
-
-    fetchRules();
-    fetchActions();
-    fetchConditions();
-    fetchSelectors();
-  }, []);
+    } catch (error) {
+      console.error('Failed to fetch selectors:', error);
+      setSelectors([]);
+    }
+  };
 
   const handleSubmit = async () => {
     const token = localStorage.getItem('token');
@@ -149,7 +137,7 @@ const CreateRules = () => {
 
       if (response.ok) {
         toast.success('Rule created successfully');
-        navigate('/rules');
+        fetchRules()
       } else {
         toast.error('Failed to create rule');
         console.error('Failed to create rule');
@@ -180,6 +168,7 @@ const CreateRules = () => {
       if (response.ok) {
         const newAction: Action = await response.json();
         setActions([...actions, newAction]);
+        fetchActions()
         toast.success('Action created successfully');
       } else {
         toast.error('Failed to create action');
@@ -211,6 +200,7 @@ const CreateRules = () => {
       if (response.ok) {
         const newCondition: Condition = await response.json();
         setConditions([...conditions, newCondition]);
+        fetchConditions()
         toast.success('Condition created successfully');
       } else {
         toast.error('Failed to create condition');
@@ -243,6 +233,7 @@ const CreateRules = () => {
       if (response.ok) {
         const newSelector: Selector = await response.json();
         setSelectors([...selectors, newSelector]);
+        fetchSelectors()
         toast.success('Selector created successfully');
       } else {
         toast.error('Failed to create selector');
@@ -254,10 +245,6 @@ const CreateRules = () => {
     }
   };
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
   return (
     <Container maxWidth="md">
       <ToastContainer />
@@ -265,7 +252,7 @@ const CreateRules = () => {
         Create Rule
       </Typography>
      
-      <Accordion>
+      <Accordion onChange={() => fetchRules()}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Rule</Typography>
         </AccordionSummary>
@@ -334,7 +321,7 @@ const CreateRules = () => {
           </Button>
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion onChange={() => fetchActions()}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Actions</Typography>
         </AccordionSummary>
@@ -391,7 +378,7 @@ const CreateRules = () => {
           </form>
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion onChange={() => fetchConditions()}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Conditions</Typography>
         </AccordionSummary>
@@ -450,7 +437,7 @@ const CreateRules = () => {
           </form>
         </AccordionDetails>
       </Accordion>
-      <Accordion>
+      <Accordion onChange={() => fetchSelectors}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography>Selectors</Typography>
         </AccordionSummary>
@@ -516,9 +503,6 @@ const CreateRules = () => {
           </form>
         </AccordionDetails>
       </Accordion>
-      {/* <Button variant="contained" color="primary" onClick={handleSubmit}>
-        Submit
-      </Button> */}
     </Container>
   );
 }
