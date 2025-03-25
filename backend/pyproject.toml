@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"] # REQUIRED if [build-system] table is used
+build-backend = "setuptools.build_meta" # If not defined, then legacy behavior can happen.
+
+
+[project]
+name = "app" 
+version = "0.0.1" 
+description = "Backend Api for grant manager"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Nathan Hampton", email = "hamp0837@vandals.uidaho.edu" }]
+dependencies = ["fastapi[standard]", "sqlmodel", "pydantic-settings", "tenacity", "pyjwt", "passlib", "emails", "psycopg[binary,pool]", "bcrypt", "alembic",'psycopg2']
