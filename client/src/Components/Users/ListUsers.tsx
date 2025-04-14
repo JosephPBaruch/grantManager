@@ -1,4 +1,4 @@
-import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { Check, Close } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
@@ -33,6 +33,8 @@ function ListUsers() {
   const navigate = useNavigate();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
   const handleEditClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -50,6 +52,46 @@ function ListUsers() {
       prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
     );
     handleEditClose();
+  };
+
+  const handleDeleteClick = (userId: string) => {
+    setUserToDelete(userId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteClose = () => {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!userToDelete) return;
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    fetch(`http://localhost:8000/api/v1/users/${userToDelete}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+    .then((response) => {
+      if (response.ok) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete));
+      } else {
+        console.error('Failed to delete user');
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting user:', error);
+    })
+    .finally(() => {
+      handleDeleteClose();
+    });
   };
 
   useEffect(() => {
@@ -95,6 +137,7 @@ function ListUsers() {
                 <TableCell>Active</TableCell>
                 <TableCell>Superuser</TableCell>
                 <TableCell>Actions</TableCell>
+                <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -114,6 +157,15 @@ function ListUsers() {
                       Edit
                     </Button>
                   </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="secondary"
+                      onClick={() => handleDeleteClick(user.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -130,6 +182,22 @@ function ListUsers() {
           onSave={handleSave}
         />
       )}
+      <Dialog open={deleteDialogOpen} onClose={handleDeleteClose}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this user? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
