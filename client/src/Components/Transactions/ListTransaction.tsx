@@ -60,8 +60,8 @@ function ViewTransactions() {
           <MakeTransactions onClose={handleCloseDialog} /> {/* Pass onClose prop */}
         </DialogContent>
       </Dialog>
-      <TableContainer style={{backgroundColor: "#e0e0e0" }} component={Paper} className={classes.tableContainer}>
-        <Table className={classes.table} aria-label="transactions table">
+      <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell align="left">Amount</TableCell>
@@ -78,9 +78,7 @@ function ViewTransactions() {
                 <TableCell align="left">{transaction.id}</TableCell>
                 <TableCell align="left">{transaction.user}</TableCell>
                 <TableCell align="left">{new Date(transaction.created_at).toLocaleString()}</TableCell>
-                <TableCell component="th" scope="row">
-                  {transaction.description}
-                </TableCell>
+                <TableCell>{transaction.description}</TableCell>
               </TableRow>
             ))}
           </TableBody>
