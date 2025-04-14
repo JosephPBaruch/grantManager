@@ -35,6 +35,7 @@ function ListUsers() {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const handleEditClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -101,6 +102,23 @@ function ListUsers() {
       return;
     }
 
+    // Fetch current user data
+    fetch('http://localhost:8000/api/v1/users/me', {
+      method: 'GET',
+      headers: {
+        'accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      setCurrentUser(data);
+    })
+    .catch((error) => {
+      console.error('Error fetching current user:', error);
+    });
+
+    // Fetch all users
     fetch('http://localhost:8000/api/v1/users/?skip=0&limit=100', {
       method: 'GET',
       headers: {
@@ -120,6 +138,33 @@ function ListUsers() {
 
   return (
     <Container maxWidth="md" className={classes.root}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        Current User
+      </Typography>
+      {currentUser && (
+        <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Full Name</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Created At</TableCell>
+                <TableCell>Active</TableCell>
+                <TableCell>Superuser</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell>{currentUser.full_name}</TableCell>
+                <TableCell>{currentUser.email}</TableCell>
+                <TableCell>{new Date(currentUser.created_at).toLocaleString()}</TableCell>
+                <TableCell>{currentUser.is_active ? <Check /> : <Close />}</TableCell>
+                <TableCell>{currentUser.is_superuser ? <Check /> : <Close />}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>
