@@ -20,7 +20,7 @@ interface EditUserProps {
 
 }
 
-const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave }) => {
+const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave, isCurrentUser }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -55,7 +55,8 @@ const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave }) =>
 
   const handleSave = () => {
     if (user) {
-      fetch(`http://localhost:8000/api/v1/users/${userId}`, {
+      const endpoint = isCurrentUser ? 'http://localhost:8000/api/v1/users/me' : `http://localhost:8000/api/v1/users/${userId}`;
+      fetch(endpoint, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

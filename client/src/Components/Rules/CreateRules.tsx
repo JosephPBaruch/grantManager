@@ -38,7 +38,7 @@ const CreateRules = () => {
 
       const data: RulesResponse = await response.json();
       if (data) {
-        setRules(data);
+        // setRules(data);
       } else {
         setRules([]);
       }
@@ -61,7 +61,7 @@ const CreateRules = () => {
 
       const data: ActionsResponse = await response.json();
       if (data) {
-        setActions(data);
+        // setActions(data);
       } else {
         setActions([]);
       }
