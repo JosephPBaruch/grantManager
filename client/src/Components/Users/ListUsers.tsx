@@ -1,10 +1,12 @@
-import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { Check, Close } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { User } from "../../types/User";
 import { useNavigate } from "react-router-dom";
 import EditUser from "./EditUser"; // Import the EditUser component
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const useStyles = makeStyles({
   root: {
@@ -36,6 +38,11 @@ function ListUsers() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [editCurrentUserDialogOpen, setEditCurrentUserDialogOpen] = useState(false);
+  const [deleteCurrentUserDialogOpen, setDeleteCurrentUserDialogOpen] = useState(false);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const handleEditClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -71,6 +78,7 @@ function ListUsers() {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
       console.error('No access token found');
+      toast.error('No access token found');
       return;
     }
 
@@ -83,12 +91,15 @@ function ListUsers() {
     .then((response) => {
       if (response.ok) {
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userToDelete));
+        toast.success('User deleted successfully');
       } else {
         console.error('Failed to delete user');
+        toast.error('Failed to delete user');
       }
     })
     .catch((error) => {
       console.error('Error deleting user:', error);
+      toast.error('Error deleting user');
     })
     .finally(() => {
       handleDeleteClose();
@@ -96,9 +107,18 @@ function ListUsers() {
   };
 
   const handleDeleteCurrentUser = () => {
+    setDeleteCurrentUserDialogOpen(true);
+  };
+
+  const handleDeleteCurrentUserClose = () => {
+    setDeleteCurrentUserDialogOpen(false);
+  };
+
+  const handleDeleteCurrentUserConfirm = () => {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
       console.error('No access token found');
+      toast.error('No access token found');
       return;
     }
 
@@ -112,12 +132,76 @@ function ListUsers() {
       if (response.ok) {
         setCurrentUser(null);
         console.log('Current user deleted successfully');
+        toast.success('Your account has been deleted successfully');
       } else {
         console.error('Failed to delete current user');
+        toast.error('Failed to delete your account');
       }
     })
     .catch((error) => {
       console.error('Error deleting current user:', error);
+      toast.error('Error deleting your account');
+    })
+    .finally(() => {
+      handleDeleteCurrentUserClose();
+    });
+  };
+
+  const handleEditCurrentUserClick = () => {
+    setEditCurrentUserDialogOpen(true);
+  };
+
+  const handleEditCurrentUserClose = () => {
+    setEditCurrentUserDialogOpen(false);
+  };
+
+  const handleSaveCurrentUser = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
+    handleEditCurrentUserClose();
+  };
+
+  const handlePasswordDialogOpen = () => {
+    setPasswordDialogOpen(true);
+  };
+
+  const handlePasswordDialogClose = () => {
+    setPasswordDialogOpen(false);
+    setCurrentPassword("");
+    setNewPassword("");
+  };
+
+  const handlePasswordUpdate = () => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      toast.error('No access token found');
+      return;
+    }
+
+    fetch('http://localhost:8000/api/v1/users/me/password', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    })
+    .then((response) => {
+      if (response.ok) {
+        console.log('Password updated successfully');
+        toast.success('Password updated successfully');
+        handlePasswordDialogClose();
+      } else {
+        console.error('Failed to update password');
+        toast.error('Failed to update password');
+      }
+    })
+    .catch((error) => {
+      console.error('Error updating password:', error);
+      toast.error('Error updating password');
     });
   };
 
@@ -125,6 +209,7 @@ function ListUsers() {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
       console.error('No access token found');
+      toast.error('No access token found');
       return;
     }
 
@@ -139,9 +224,11 @@ function ListUsers() {
     .then((response) => response.json())
     .then((data) => {
       setCurrentUser(data);
+      toast.success('Current user data fetched successfully');
     })
     .catch((error) => {
       console.error('Error fetching current user:', error);
+      toast.error('Error fetching current user');
     });
 
     // Fetch all users
@@ -156,14 +243,17 @@ function ListUsers() {
     .then((data) => {
       console.log(data.data);
       setUsers(data.data);
+      toast.success('Users fetched successfully');
     })
     .catch((error) => {
       console.error('Error fetching users:', error);
+      toast.error('Error fetching users');
     });
   }, []);
 
   return (
     <Container maxWidth="md" className={classes.root}>
+      <ToastContainer />
       <Typography variant="h4" component="h1" gutterBottom>
         Current User
       </Typography>
@@ -177,6 +267,7 @@ function ListUsers() {
                 <TableCell>Created At</TableCell>
                 <TableCell>Active</TableCell>
                 <TableCell>Superuser</TableCell>
+                <TableCell>Edit</TableCell>
                 <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
@@ -187,6 +278,15 @@ function ListUsers() {
                 <TableCell>{new Date(currentUser.created_at).toLocaleString()}</TableCell>
                 <TableCell>{currentUser.is_active ? <Check /> : <Close />}</TableCell>
                 <TableCell>{currentUser.is_superuser ? <Check /> : <Close />}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleEditCurrentUserClick}
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="outlined"
@@ -201,6 +301,71 @@ function ListUsers() {
           </Table>
         </TableContainer>
       )}
+      {editCurrentUserDialogOpen && (
+        <EditUser
+          userId="me"
+          open={editCurrentUserDialogOpen}
+          onClose={handleEditCurrentUserClose}
+          onSave={handleSaveCurrentUser}
+          isCurrentUser={true}
+        />
+      )}
+      <Dialog open={deleteCurrentUserDialogOpen} onClose={handleDeleteCurrentUserClose}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete your account? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCurrentUserClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteCurrentUserConfirm} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handlePasswordDialogOpen}
+        style={{ marginBottom: '20px' }}
+      >
+        Update Password
+      </Button>
+      <Dialog open={passwordDialogOpen} onClose={handlePasswordDialogClose}>
+        <DialogTitle>Update Password</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter your current password and the new password you want to set.
+          </DialogContentText>
+          <TextField
+            margin="dense"
+            label="Current Password"
+            type="password"
+            fullWidth
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="New Password"
+            type="password"
+            fullWidth
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePasswordDialogClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handlePasswordUpdate} color="secondary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>

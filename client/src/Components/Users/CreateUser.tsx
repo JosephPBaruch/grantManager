@@ -3,6 +3,7 @@ import { Button, TextField, Container, Typography, Checkbox, FormControlLabel } 
 import { makeStyles } from '@mui/styles';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles({
   form: {
@@ -26,6 +27,7 @@ const CreateUser: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [admin, setAdmin] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -54,6 +56,7 @@ const CreateUser: React.FC = () => {
     }).then((response) => {
       if (response.ok) {
         toast.success('User created successfully!');
+        navigate("/list-users")
       } else {
         toast.error('Error creating user: ' + response.statusText);
         console.error('Error creating user:', response.statusText);
