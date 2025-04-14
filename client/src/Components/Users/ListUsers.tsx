@@ -95,6 +95,32 @@ function ListUsers() {
     });
   };
 
+  const handleDeleteCurrentUser = () => {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    fetch('http://localhost:8000/api/v1/users/me', {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    })
+    .then((response) => {
+      if (response.ok) {
+        setCurrentUser(null);
+        console.log('Current user deleted successfully');
+      } else {
+        console.error('Failed to delete current user');
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting current user:', error);
+    });
+  };
+
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
@@ -151,6 +177,7 @@ function ListUsers() {
                 <TableCell>Created At</TableCell>
                 <TableCell>Active</TableCell>
                 <TableCell>Superuser</TableCell>
+                <TableCell>Delete</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -160,6 +187,15 @@ function ListUsers() {
                 <TableCell>{new Date(currentUser.created_at).toLocaleString()}</TableCell>
                 <TableCell>{currentUser.is_active ? <Check /> : <Close />}</TableCell>
                 <TableCell>{currentUser.is_superuser ? <Check /> : <Close />}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleDeleteCurrentUser}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
