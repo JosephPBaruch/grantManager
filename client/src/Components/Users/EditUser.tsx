@@ -60,7 +60,31 @@ const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave }) =>
 
   const handleSave = () => {
     if (user) {
-      onSave(user);
+      fetch(`http://localhost:8000/api/v1/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('access_token')}`,
+        },
+        body: JSON.stringify({
+          email: user.email,
+          full_name: user.full_name,
+          is_active: user.is_active,
+          is_superuser: user.is_superuser,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to update user");
+          }
+          return response.json();
+        })
+        .then((updatedUser) => {
+          onSave(updatedUser);
+        })
+        .catch((error) => {
+          console.error("Error updating user:", error);
+        });
     }
   };
 
