@@ -1,7 +1,6 @@
-import { Container, Typography, Paper, TextField, Button, IconButton } from "@mui/material";
+import { Container, Typography, Paper, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
-import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
@@ -37,8 +36,6 @@ function CreateBudget() {
   const [budgetName, setBudgetName] = useState('');
   const [endDate, setEndDate] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
-  const [customRules, setCustomRules] = useState<string[]>([]);
-  const [newRule, setNewRule] = useState('');
   const nagivate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -78,13 +75,6 @@ function CreateBudget() {
     });
   };
 
-  const handleAddRule = () => {
-    if (newRule.trim()) {
-      setCustomRules([...customRules, newRule]);
-      setNewRule('');
-    }
-  };
-
   return (
     <Container maxWidth="sm" className={classes.root}>
         <Typography variant="h4">
@@ -121,24 +111,6 @@ function CreateBudget() {
           onChange={(e) => setTotalAmount(e.target.value)}
           required
         />
-        <div className={classes.customRule}>
-          <TextField
-            label="Custom Rule"
-            variant="outlined"
-            className={classes.formField}
-            value={newRule}
-            onChange={(e) => setNewRule(e.target.value)}
-          />
-          <IconButton color="primary" onClick={handleAddRule}>
-            <AddIcon />
-          </IconButton>
-        </div>
-        {customRules.map((rule, index) => (
-          <Typography key={index} variant="body2">
-            {rule}
-            {/* This will be corrected later on to actually create rules */}
-          </Typography>
-        ))}
         <Button
           type="submit"
           variant="contained"
@@ -146,6 +118,13 @@ function CreateBudget() {
           className={classes.submitButton}
         >
           Create Budget
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => nagivate("/budgets")}
+        >
+          Select Budget
         </Button>
       </Paper>
     </Container>

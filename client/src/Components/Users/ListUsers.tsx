@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { User } from "../../types/User";
 import { useNavigate } from "react-router-dom";
+import EditUser from "./EditUser"; // Import the EditUser component
 
 const useStyles = makeStyles({
   root: {
@@ -30,6 +31,26 @@ function ListUsers() {
   const classes = useStyles();
   const [users, setUsers] = useState<User[]>([]);
   const navigate = useNavigate();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const handleEditClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setEditDialogOpen(false);
+    setSelectedUserId(null);
+  };
+
+  const handleSave = (updatedUser: User) => {
+    // Update the user in the list after saving
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
+    handleEditClose();
+  };
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
@@ -63,7 +84,7 @@ function ListUsers() {
       <Button variant="contained" color="primary" onClick={() => navigate('/users')}>
         Create User
       </Button>
-      {users.length > 0 ? (
+      {users ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -73,6 +94,7 @@ function ListUsers() {
                 <TableCell>Created At</TableCell>
                 <TableCell>Active</TableCell>
                 <TableCell>Superuser</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -83,6 +105,15 @@ function ListUsers() {
                   <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
                   <TableCell>{user.is_active ? <Check /> : <Close />}</TableCell>
                   <TableCell>{user.is_superuser ? <Check /> : <Close />}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => handleEditClick(user.id)}
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -90,6 +121,14 @@ function ListUsers() {
         </TableContainer>
       ) : (
         <Typography variant="body1">No users found.</Typography>
+      )}
+      {selectedUserId && (
+        <EditUser
+          userId={selectedUserId}
+          open={editDialogOpen}
+          onClose={handleEditClose}
+          onSave={handleSave}
+        />
       )}
     </Container>
   );
