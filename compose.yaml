@@ -101,5 +101,19 @@ services:
       args:
         ENVIRONMENT: ${ENVIRONMENT}
 
+  frontend:
+    image: grant-mgmt-client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      backend:
+        condition: service_healthy
+
 volumes:
   app-db-data:
