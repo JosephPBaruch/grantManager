@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from pydantic import EmailStr
@@ -58,10 +58,6 @@ class UsersPublic(SQLModel):
     data: list[UserPublic]
     count: int
 
-
-# Generic message
-class Message(SQLModel):
-    message: str
 
 
 # JSON payload containing access token
@@ -174,27 +170,142 @@ class _RulesSystemTables(SQLModel, table=True):
     name: Optional[str] = Field(default=None, primary_key=True)
 
 
-class BudgetBase(SQLModel):
-    """Base Budget Model."""
-
-    name: str = Field(min_length=2, max_length=40)
-    funding_source: str = Field()
+class GrantBase(SQLModel):
+    """Base Grant Model."""
+    title: str = Field(min_length=2, max_length=255)
+    grant_number: str = Field(unique=True, index=True)
+    funding_agency: str = Field()
+    owner_id: uuid.UUID = Field(foreign_key="user.id")
     start_date: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
     )
     end_date: datetime = Field(
         sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
     )
-    amount: float = Field(default=0)
+    total_amount: float = Field(default=0)
+    status: str = Field(default="active")  # active, completed, terminated
+    description: Optional[str] = Field(default=None)
 
 
-class Budget(BudgetBase, table=True):
-    """Budget Table Model."""
+class Grant(GrantBase, table=True):
+    """Grant Table Model."""
+    __tablename__ = "grant"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime = Field(
+        default_factory=datetime.now(UTC),
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    updated_at: datetime = Field(
+        default_factory=datetime.now(UTC),
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
 
-    __tablename__ = "budget"
+
+class GrantCategoryBase(SQLModel):
+    """Base Grant Category Model."""
+    name: str = Field(unique=True, index=True)
+    description: Optional[str] = Field(default=None)
+    code: str = Field(unique=True, index=True)  # e.g., "SAL" for salary, "TRV" for travel
+    is_active: bool = Field(default=True)
+
+
+class GrantCategory(GrantCategoryBase, table=True):
+    """Grant Category Table Model."""
+    __tablename__ = "grant_category"
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
 
-class BudgetsPublic(SQLModel):
-    data: list[Budget]
+class GrantExpenseBase(SQLModel):
+    """Base Grant Expense Model."""
+    budget_line_id: uuid.UUID = Field(foreign_key="grant_budget_line.id")
+    amount: float = Field()
+    date: datetime = Field(
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    description: str = Field()
+    invoice_number: Optional[str] = Field(default=None)
+    status: str = Field(default="pending")  # pending, approved, rejected, paids
+
+
+class GrantExpense(GrantExpenseBase, table=True):
+    """Grant Expense Table Model."""
+    __tablename__ = "grant_expense"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    updated_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    created_by: uuid.UUID = Field(foreign_key="user.id")
+
+
+class GrantApprovalBase(SQLModel):
+    """Base Grant Approval Model."""
+    grant_id: uuid.UUID = Field(foreign_key="grant.id")
+    expense_id: Optional[uuid.UUID] = Field(default=None, foreign_key="grant_expense.id")
+    approver_id: uuid.UUID = Field(foreign_key="user.id")
+    status: str = Field()  # approved, rejected, pending
+    comments: Optional[str] = Field(default=None)
+    level: int = Field()  # Approval level (1, 2, 3, etc.)
+
+
+class GrantApproval(GrantApprovalBase, table=True):
+    """Grant Approval Table Model."""
+    __tablename__ = "grant_approval"
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    created_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+    updated_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column=Column(TIMESTAMP(timezone=True), nullable=False)
+    )
+
+
+# Public models for API responses
+class GrantPublic(GrantBase):
+    id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class GrantCategoryPublic(GrantCategoryBase):
+    id: uuid.UUID
+
+
+class GrantExpensePublic(GrantExpenseBase):
+    id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+    created_by: uuid.UUID
+
+
+class GrantApprovalPublic(GrantApprovalBase):
+    id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+# List response models
+class GrantsPublic(SQLModel):
+    data: list[GrantPublic]
+    count: int
+
+
+class GrantCategoriesPublic(SQLModel):
+    data: list[GrantCategoryPublic]
+    count: int
+
+
+class GrantExpensesPublic(SQLModel):
+    data: list[GrantExpensePublic]
+    count: int
+
+
+class GrantApprovalsPublic(SQLModel):
+    data: list[GrantApprovalPublic]
     count: int
