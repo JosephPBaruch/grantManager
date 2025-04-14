@@ -1,7 +1,8 @@
-import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { Transaction } from "../../types/Transaction";
+import MakeTransactions from "./MakeTransactions"; // Import the MakeTransactions component
 
 const useStyles = makeStyles({
   root: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles({
 function ViewTransactions() {
   const classes = useStyles();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [openDialog, setOpenDialog] = useState(false); // State to control dialog visibility
 
   useEffect(() => {
     fetch('http://127.0.0.1:8080/api/transactions/', {
@@ -41,11 +43,23 @@ function ViewTransactions() {
     });
   }, []);
 
+  const handleOpenDialog = () => setOpenDialog(true);
+  const handleCloseDialog = () => setOpenDialog(false);
+
   return (
     <Container maxWidth="sm" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
         Transactions
       </Typography>
+      <Button variant="contained" color="primary" onClick={handleOpenDialog}>
+        Create Transaction
+      </Button>
+      <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Create Transaction</DialogTitle>
+        <DialogContent>
+          <MakeTransactions onClose={handleCloseDialog} /> {/* Pass onClose prop */}
+        </DialogContent>
+      </Dialog>
       <TableContainer style={{backgroundColor: "#e0e0e0" }} component={Paper} className={classes.tableContainer}>
         <Table className={classes.table} aria-label="transactions table">
           <TableHead>

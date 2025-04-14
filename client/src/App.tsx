@@ -95,16 +95,9 @@ function LocationBasedComponents() {
             <Typography variant="h6" className={classes.title}>
               UIdaho Grant Management {budgetName && `- ${budgetName}`}
             </Typography>
-            {/* TODO: Finish transactions once database has these */}
-            {/* <Button color="inherit">
-              <Link to="/transactions" className={classes.link}>Make Transaction</Link>
-            </Button>
             <Button color="inherit">
               <Link to="/list-transactions" className={classes.link}>Transactions</Link>
-            </Button> */}
-            {/* <Button color="inherit">
-              <Link to="/users" className={classes.link}>Create Users</Link>
-            </Button> */}
+            </Button>
             <Button color="inherit">
               <Link to="/list-users" className={classes.link}>Users</Link>
             </Button>
@@ -130,7 +123,7 @@ function LocationBasedComponents() {
             <Route path="/" element={<SignIn />} />
             <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
             <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
-            {/* <Route path="/list-transactions" element={<ViewTransactions />} /> */}
+            <Route path="/list-transactions" element={<ViewTransactions />} />
             <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
             <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-up" element={<SignUp />} />

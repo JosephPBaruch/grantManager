@@ -224,7 +224,7 @@ function ListUsers() {
     .then((response) => response.json())
     .then((data) => {
       setCurrentUser(data);
-      toast.success('Current user data fetched successfully');
+      // toast.success('Current user data fetched successfully');
     })
     .catch((error) => {
       console.error('Error fetching current user:', error);
@@ -243,7 +243,7 @@ function ListUsers() {
     .then((data) => {
       console.log(data.data);
       setUsers(data.data);
-      toast.success('Users fetched successfully');
+      // toast.success('Users fetched successfully');
     })
     .catch((error) => {
       console.error('Error fetching users:', error);
@@ -257,6 +257,14 @@ function ListUsers() {
       <Typography variant="h4" component="h1" gutterBottom>
         Current User
       </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handlePasswordDialogOpen}
+        style={{ marginBottom: '20px' }}
+      >
+        Update Password
+      </Button>
       {currentUser && (
         <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
           <Table>
@@ -326,14 +334,7 @@ function ListUsers() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handlePasswordDialogOpen}
-        style={{ marginBottom: '20px' }}
-      >
-        Update Password
-      </Button>
+
       <Dialog open={passwordDialogOpen} onClose={handlePasswordDialogClose}>
         <DialogTitle>Update Password</DialogTitle>
         <DialogContent>

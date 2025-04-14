@@ -40,9 +40,6 @@ function Transactions() {
 
   return (
     <Container maxWidth="sm">
-      <Typography style={{paddingTop: '20px'}} variant="h4" component="h1" gutterBottom>
-        Transactions
-      </Typography>
       <form className={classes.form}>
         <TextField
           label="Amount"
