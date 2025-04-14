@@ -119,7 +119,7 @@ function ListUsers() {
   }, []);
 
   return (
-    <Container maxWidth="sm" className={classes.root}>
+    <Container maxWidth="md" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>
