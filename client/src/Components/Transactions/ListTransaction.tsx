@@ -71,7 +71,7 @@ function ViewTransactions() {
     })
     .then((response) => {
       if (response.ok) {
-        setPendingTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+        setPendingTransactions((prev) => prev.filter((t) => String(t.id)  !== transactionId));
       } else {
         console.error('Failed to approve transaction');
       }
@@ -90,7 +90,7 @@ function ViewTransactions() {
     })
     .then((response) => {
       if (response.ok) {
-        setPendingTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+        setPendingTransactions((prev) => prev.filter((t) => String(t.id) !== transactionId));
       } else {
         console.error('Failed to disapprove transaction');
       }
@@ -111,7 +111,7 @@ function ViewTransactions() {
       <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
         <DialogTitle>Create Transaction</DialogTitle>
         <DialogContent>
-          <MakeTransactions onClose={handleCloseDialog} /> {/* Pass onClose prop */}
+          <MakeTransactions />
         </DialogContent>
       </Dialog>
       <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
@@ -166,7 +166,7 @@ function ViewTransactions() {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleApprove(transaction.id)}
+                    onClick={() => handleApprove(String(transaction.id))}
                     style={{ marginRight: '10px' }}
                   >
                     Approve
@@ -174,7 +174,7 @@ function ViewTransactions() {
                   <Button
                     variant="contained"
                     color="secondary"
-                    onClick={() => handleDisapprove(transaction.id)}
+                    onClick={() => handleDisapprove(String(transaction.id))}
                   >
                     Disapprove
                   </Button>

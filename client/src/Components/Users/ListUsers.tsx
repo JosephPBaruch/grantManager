@@ -427,6 +427,7 @@ function ListUsers() {
           open={editDialogOpen}
           onClose={handleEditClose}
           onSave={handleSave}
+          isCurrentUser={false}
         />
       )}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteClose}>

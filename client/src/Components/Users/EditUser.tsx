@@ -9,20 +9,15 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-
-interface User {
-  email: string;
-  is_active: boolean;
-  is_superuser: boolean;
-  full_name: string;
-  id: string;
-}
+import { User } from "../../types/User";
 
 interface EditUserProps {
   userId: string;
   open: boolean;
   onClose: () => void;
   onSave: (updatedUser: User) => void;
+  isCurrentUser: boolean;
+
 }
 
 const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave }) => {
