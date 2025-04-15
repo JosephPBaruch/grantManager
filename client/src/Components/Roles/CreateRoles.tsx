@@ -71,7 +71,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
+      console.log(users);
       const data = await response.json();
       console.log('Role created successfully:', data);
       onClose();

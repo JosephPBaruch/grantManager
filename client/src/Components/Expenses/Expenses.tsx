@@ -60,7 +60,7 @@ function Expenses() {
   const handleCloseDialog = () => setOpenDialog(false);
 
   return (
-    <Container maxWidth="sm" className={classes.root}>
+    <Container maxWidth="md" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
         Expenses
       </Typography>
@@ -85,15 +85,17 @@ function Expenses() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell align="left">{transaction.amount}</TableCell>
-                <TableCell align="left">{new Date(transaction.date).toLocaleString()}</TableCell>
-                <TableCell align="left">{transaction.description}</TableCell>
-                <TableCell align="left">{transaction.category}</TableCell>
-                <TableCell align="left">{transaction.created_by}</TableCell>
-              </TableRow>
-            ))}
+            {transactions
+              .filter((transaction) => transaction.grant_id === localStorage.getItem("selected_grant_id"))
+              .map((transaction) => (
+                <TableRow key={transaction.id}>
+                  <TableCell align="left">{transaction.amount}</TableCell>
+                  <TableCell align="left">{new Date(transaction.date).toLocaleString()}</TableCell>
+                  <TableCell align="left">{transaction.description}</TableCell>
+                  <TableCell align="left">{transaction.category}</TableCell>
+                  <TableCell align="left">{transaction.created_by}</TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
