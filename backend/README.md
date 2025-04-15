@@ -1,67 +1,44 @@
 # University of Idaho Grant Budget Management Backend Service
 
-## Django Application Commands
-
-### Virtual environment
-
-#### Create the virtual environment
-
-> This is not necessary after the first time
-
-```bash
-    python -m venv env
+## Virtual environment
+If you haven't created your virtual enviroment use the following command,
+only needs to be done once per machine
+```sh
+    python -m venv .venv
 ```
 
-#### Activating the virtual environment
+### Activating the virtual environment
+Use the following to activate the virtual environment before running the server
 
-```bash
-    source env/bin/activate
+Windows:
+```powershell
+    ./env/scripts/activate
 ```
 
-#### Install the dependencies
+## Install the Application
+To run and install the application use the following 
+```sh
+    pip install -e .
+```
+## Postgres Migration
+If this is your first time running the backend or if you update the backend models file
+then you need to run the migration script.
 
-> This shouldn't be necessary after the first time.
-
-```bash
-    pip install -r requirements.txt
+Create a new migration. (ONLY RUN IF YOU UPDATED THE MODELS)
+```sh
+    alembic revision --autogenerate -m "CHANGE DESCRIPTION"
 ```
 
-##### Updating the requirements.txt
-
-> If you update the requirements.txt, it shoudl be updated. Use this command. 
-
-```bash 
-    pip freeze > requirements.txt
+Update the db to the current migration
+```sh
+    alembic upgrade head
 ```
 
-### Applying changes
+## Running the Application
 
-'''bash
-
-    python manage.py makemigrations
-
-    python manage.py migrate
-
-'''
-
-### Running the Application
-
-> Make sure you are in the backend/service directory. Note: The frontend requires port 8080. 
-
-TODO: Solution to running the applications and configuring ports
+> Make sure you are in the backend/service directory.
 
 ```bash
+    fastapi dev ./app/main.py
 
-    python manage.py runserver 8080
-
-```
-
-### Reset the database
-
-> Clearing might be required when modifying models.
-
-```bash
-
-    python manage.py flush
-    
 ```

@@ -26,3 +26,7 @@ __pycache__/
 *.mypy_cache/
 *.tox/
 *.env
+*.venv
+
+# Local db for testing
+startdb.bat

@@ -1,0 +1,3 @@
+RuleID,Name,Description,Trigger,Table
+1,Rule 1,Test 1 RULE,1someTrigger,"schema.'"table'""
+2,Rule 2,Test 2 RULE,2someTrigger,"schema.'"table'""
