@@ -1,5 +1,7 @@
-import { Container, Typography, } from "@mui/material";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { makeStyles } from '@mui/styles';
+import { useEffect, useState } from "react";
+import { Role } from "../types/Roles";
 
 const useStyles = makeStyles({
   root: {
@@ -9,30 +11,70 @@ const useStyles = makeStyles({
     gap: '20px',
     marginTop: '20px',
   },
-  budgetCard: {
-    padding: '20px',
-    width: '100%',
-    maxWidth: '600px',
-    marginBottom: '10px',
-  },
-  budgetInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '5px',
-  },
-  createButton: {
+  tableContainer: {
     marginTop: '20px',
+    maxWidth: '800px',
   },
 });
 
 function Roles() {
   const classes = useStyles();
- 
+  const [roles, setRoles] = useState<Role[]>([]); 
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
+          method: 'GET',
+          headers: {
+              'accept': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setRoles(data.data);
+      } catch (error) {
+        console.error("Error fetching roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
+
   return (
     <Container maxWidth="sm" className={classes.root}>
-        <Typography variant="h4">
-            Roles
-        </Typography>
+      <Typography variant="h4">
+        Roles
+      </Typography>
+      <TableContainer component={Paper} className={classes.tableContainer}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Grant ID</TableCell>
+              <TableCell>User ID</TableCell>
+              <TableCell>Role Type</TableCell>
+              <TableCell>Permissions</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Updated At</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {roles.map((role) => (
+              <TableRow key={role.id}>
+                <TableCell>{role.grant_id}</TableCell>
+                <TableCell>{role.user_id}</TableCell>
+                <TableCell>{role.role_type}</TableCell>
+                <TableCell>{role.permissions.join(", ")}</TableCell>
+                <TableCell>{new Date(role.created_at).toLocaleString()}</TableCell>
+                <TableCell>{new Date(role.updated_at).toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Container>
   );
 }
