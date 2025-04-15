@@ -25,7 +25,7 @@ function CreateExpenses() {
   const [date, setDate] = useState('');
   const [category, setCategory] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
-  const [grantId, setGrantId] = useState(localStorage.getItem('selected_grant_title') || '');
+  const [grantId, setGrantId] = useState(localStorage.getItem('selected_grant_id') || '');
 
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();

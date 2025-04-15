@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const CreateRules = () => {
   const [formData, setFormData] = useState({
-    grant_id: '',
+    grant_id: localStorage.getItem('selected_grant_id') || '',
     name: '',
     description: '',
     rule_type: '',
@@ -57,6 +57,7 @@ const CreateRules = () => {
           name="grant_id"
           value={formData.grant_id}
           onChange={handleChange}
+          placeholder="Enter the grant ID (e.g., UUID)"
           fullWidth
         />
         <TextField
@@ -64,6 +65,7 @@ const CreateRules = () => {
           name="name"
           value={formData.name}
           onChange={handleChange}
+          placeholder="Enter the rule name"
           fullWidth
         />
         <TextField
@@ -71,6 +73,7 @@ const CreateRules = () => {
           name="description"
           value={formData.description}
           onChange={handleChange}
+          placeholder="Enter a brief description of the rule"
           fullWidth
         />
         <TextField
@@ -78,6 +81,7 @@ const CreateRules = () => {
           name="rule_type"
           value={formData.rule_type}
           onChange={handleChange}
+          placeholder="Enter the rule type (e.g., expense)"
           fullWidth
         />
         <TextField
@@ -85,6 +89,7 @@ const CreateRules = () => {
           name="aggregator"
           value={formData.aggregator}
           onChange={handleChange}
+          placeholder="Enter the aggregator (e.g., SUM, AVG)"
           fullWidth
         />
         <TextField
@@ -92,6 +97,7 @@ const CreateRules = () => {
           name="error_message"
           value={formData.error_message}
           onChange={handleChange}
+          placeholder="Enter the error message to display"
           fullWidth
         />
         <TextField
@@ -104,6 +110,7 @@ const CreateRules = () => {
               filters: [{ ...formData.filters[0], field: e.target.value }],
             })
           }
+          placeholder="Enter the filter field (e.g., amount)"
           fullWidth
         />
         <TextField
@@ -116,6 +123,7 @@ const CreateRules = () => {
               filters: [{ ...formData.filters[0], operator: e.target.value }],
             })
           }
+          placeholder="Enter the filter operator (e.g., =, >, <)"
           fullWidth
         />
         <TextField
@@ -128,6 +136,7 @@ const CreateRules = () => {
               filters: [{ ...formData.filters[0], value: e.target.value }],
             })
           }
+          placeholder="Enter the filter value (e.g., 1000)"
           fullWidth
         />
         <TextField
@@ -140,6 +149,7 @@ const CreateRules = () => {
               conditions: [{ ...formData.conditions[0], field: e.target.value }],
             })
           }
+          placeholder="Enter the condition field (e.g., category)"
           fullWidth
         />
         <TextField
@@ -152,6 +162,7 @@ const CreateRules = () => {
               conditions: [{ ...formData.conditions[0], operator: e.target.value }],
             })
           }
+          placeholder="Enter the condition operator (e.g., =, >, <)"
           fullWidth
         />
         <TextField
@@ -164,6 +175,7 @@ const CreateRules = () => {
               conditions: [{ ...formData.conditions[0], value: e.target.value }],
             })
           }
+          placeholder="Enter the condition value (e.g., travel)"
           fullWidth
         />
         <TextField
@@ -177,6 +189,7 @@ const CreateRules = () => {
               conditions: [{ ...formData.conditions[0], order: parseInt(e.target.value, 10) }],
             })
           }
+          placeholder="Enter the condition order (e.g., 0, 1, 2)"
           fullWidth
         />
         <Button variant="contained" color="primary" onClick={handleSubmit}>
