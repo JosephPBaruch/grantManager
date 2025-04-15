@@ -6,10 +6,14 @@ import {
   CircularProgress, 
   Container, 
   Drawer, 
-  List, 
-  ListItem, 
-  ListItemText, 
-  Typography 
+  Typography, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow, 
+  Paper 
 } from '@mui/material';
 
 const Rules = () => {
@@ -74,21 +78,36 @@ const Rules = () => {
       {rules.length === 0 ? (
         <Typography variant="body1">No rules available.</Typography>
       ) : (
-        <div style={{ display: 'flex' }}>
-          <List style={{ width: '40%' }}>
-            {rules.map(rule => (
-              <ListItem 
-                button 
-                key={rule.id} 
-                onClick={() => setSelectedRule(rule)}
-              >
-                <ListItemText 
-                  primary={rule.name} 
-                  secondary={`${rule.description} (${rule.rule_type})`} 
-                />
-              </ListItem>
-            ))}
-          </List>
+        <div>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Description</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Aggregator</TableCell>
+                  <TableCell>Active</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rules.map((rule) => (
+                  <TableRow 
+                    key={rule.id} 
+                    hover 
+                    onClick={() => setSelectedRule(rule)} 
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <TableCell>{rule.name}</TableCell>
+                    <TableCell>{rule.description}</TableCell>
+                    <TableCell>{rule.rule_type}</TableCell>
+                    <TableCell>{rule.aggregator}</TableCell>
+                    <TableCell>{rule.is_active ? 'Yes' : 'No'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <Drawer
             anchor="right"
             open={!!selectedRule}
