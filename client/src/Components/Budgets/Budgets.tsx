@@ -2,7 +2,7 @@ import { Container, Typography, Paper, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
-import { Budget } from "../types/Budget";
+import { Budget } from "../../types/Budget";
 
 const useStyles = makeStyles({
   root: {
@@ -34,15 +34,23 @@ function Budgets() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8080/api/budgets/', {
+    const token = localStorage.getItem('access_token');
+    fetch('http://localhost:8000/api/v1/budget/?skip=0&limit=100', {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        'accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
     })
     .then((response) => response.json())
     .then((data) => {
-      setBudgets(data);
+      // console.log(data.data);
+      if (data.data && Array.isArray(data.data)) {
+        setBudgets(data.data);
+      } else {
+        console.error('Unexpected data format:', data);
+        setBudgets([]);
+      }
     })
     .catch((error) => {
       console.error('Error fetching budgets:', error);
@@ -51,6 +59,12 @@ function Budgets() {
 
   const handleCreateBudget = () => {
     navigate("/create-budget");
+  };
+
+  const handleSelectBudget = (id: string, name: string) => {
+    localStorage.setItem('selected_budget_id', id);
+    localStorage.setItem('selected_budget_name', name);
+    navigate("/list-users");
   };
 
   return (
@@ -63,12 +77,18 @@ function Budgets() {
       </Typography>
       {budgets.length > 0 ? (
         budgets.map((budget) => (
-          <Paper style={{backgroundColor: "#e0e0e0" }} key={budget.id} className={classes.budgetCard}>
+          <Paper 
+            style={{backgroundColor: "#e0e0e0", cursor: 'pointer' }} 
+            key={budget.id} 
+            className={classes.budgetCard}
+            onClick={() => handleSelectBudget(budget.id, budget.name)}
+          >
             <div className={classes.budgetInfo}>
               <Typography variant="h6">{budget.name}</Typography>
-              <Typography variant="body1">End Date: {new Date(budget.endDate).toLocaleDateString()}</Typography>
-              <Typography variant="body1">Total Amount: ${budget.totalAmount}</Typography>
-              <Typography variant="body2">Rules: {budget.rules.join(', ')}</Typography>
+              <Typography variant="body1">Start Date: {new Date(budget.start_date).toLocaleDateString()}</Typography>
+              <Typography variant="body1">End Date: {new Date(budget.end_date).toLocaleDateString()}</Typography>
+              <Typography variant="body1">Total Amount: ${budget.amount}</Typography>
+              <Typography variant="body2">Funding Source: {budget.funding_source}</Typography>
             </div>
           </Paper>
         ))

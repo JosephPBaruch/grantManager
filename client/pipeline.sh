@@ -17,7 +17,7 @@ fi
 
 # Build image
 echo "Building the new $IMAGE Docker image..."
-docker build -t $IMAGE .
+docker build -t $IMAGE --build-arg ENVIRONMENT=${ENVIRONMENT} .
 
 # Run container
 echo "Running the new $IMAGE Docker container..."

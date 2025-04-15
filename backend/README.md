@@ -6,13 +6,17 @@ only needs to be done once per machine
 ```sh
     python -m venv .venv
 ```
-
 ### Activating the virtual environment
 Use the following to activate the virtual environment before running the server
 
 Windows:
 ```powershell
     ./env/scripts/activate
+```
+
+Linux
+```sh
+    source .venv/bin/activate
 ```
 
 ## Install the Application
