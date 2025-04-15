@@ -2,7 +2,7 @@ import { Container, Typography, Paper, Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
-import { Budget } from "../../types/Budget";
+import { Budget } from "../../types/Grant";
 
 const useStyles = makeStyles({
   root: {
@@ -35,7 +35,7 @@ function Budgets() {
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    fetch('http://localhost:8000/api/v1/budget/?skip=0&limit=100', {
+    fetch('http://localhost:8000/api/v1/grants/?skip=0&limit=100', {
       method: 'GET',
       headers: {
         'accept': 'application/json',
@@ -44,7 +44,6 @@ function Budgets() {
     })
     .then((response) => response.json())
     .then((data) => {
-      // console.log(data.data);
       if (data.data && Array.isArray(data.data)) {
         setBudgets(data.data);
       } else {
@@ -58,12 +57,12 @@ function Budgets() {
   }, []);
 
   const handleCreateBudget = () => {
-    navigate("/create-budget");
+    navigate("/create-grant");
   };
 
-  const handleSelectBudget = (id: string, name: string) => {
-    localStorage.setItem('selected_budget_id', id);
-    localStorage.setItem('selected_budget_name', name);
+  const handleSelectBudget = (id: string, title: string) => {
+    localStorage.setItem('selected_grant_id', id);
+    localStorage.setItem('selected_grant_title', title);
     navigate("/list-users");
   };
 
@@ -73,7 +72,7 @@ function Budgets() {
                 UIdaho Grant Management
         </Typography>
       <Typography variant="h6"  gutterBottom>
-        Budgets
+        Grants
       </Typography>
       {budgets.length > 0 ? (
         budgets.map((budget) => (
@@ -81,19 +80,21 @@ function Budgets() {
             style={{backgroundColor: "#e0e0e0", cursor: 'pointer' }} 
             key={budget.id} 
             className={classes.budgetCard}
-            onClick={() => handleSelectBudget(budget.id, budget.name)}
+            onClick={() => handleSelectBudget(budget.id, budget.title)}
           >
             <div className={classes.budgetInfo}>
-              <Typography variant="h6">{budget.name}</Typography>
+              <Typography variant="h6">{budget.title}</Typography>
+              <Typography variant="body1">Funding Agency: {budget.funding_agency}</Typography>
               <Typography variant="body1">Start Date: {new Date(budget.start_date).toLocaleDateString()}</Typography>
               <Typography variant="body1">End Date: {new Date(budget.end_date).toLocaleDateString()}</Typography>
-              <Typography variant="body1">Total Amount: ${budget.amount}</Typography>
-              <Typography variant="body2">Funding Source: {budget.funding_source}</Typography>
+              <Typography variant="body1">Total Amount: ${budget.total_amount}</Typography>
+              <Typography variant="body1">Status: {budget.status}</Typography>
+              <Typography variant="body2">Description: {budget.description}</Typography>
             </div>
           </Paper>
         ))
       ) : (
-        <Typography variant="body1">No budgets found.</Typography>
+        <Typography variant="body1">No grants found.</Typography>
       )}
       <Button
         variant="contained"
@@ -101,7 +102,7 @@ function Budgets() {
         className={classes.createButton}
         onClick={handleCreateBudget}
       >
-        Create New Budget
+        Create New Grant
       </Button>
     </Container>
   );

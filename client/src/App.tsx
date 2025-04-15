@@ -6,8 +6,8 @@ import CreateUser from './Components/Users/CreateUser';
 import { makeStyles } from '@mui/styles';
 import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mui/material';
 import SignIn from './Components/Sign/SignIn';
-import CreateBudget from './Components/Budgets/CreateBudget';
-import Budgets from './Components/Budgets/Budgets';
+import CreateBudget from './Components/Grants/CreateGrants';
+import Budgets from './Components/Grants/Grants';
 import SignUp from './Components/Sign/SignUp';
 import Rules from './Components/Rules/Rules'
 import ProtectedRoute from './Components/ProtectedRoute';
@@ -77,7 +77,7 @@ function LocationBasedComponents() {
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     setIsAuthenticated(!!accessToken);
-    const storedBudgetName = localStorage.getItem('selected_budget_name');
+    const storedBudgetName = localStorage.getItem('selected_grant_title');
     setBudgetName(storedBudgetName || '');
   }, [location]);
 
@@ -107,7 +107,7 @@ function LocationBasedComponents() {
                   <Link to="/rules" className={classes.link}>Rules</Link>
                 </Button>
                 <Button color="inherit">
-                  <Link to="/budgets" className={classes.link}>Budget</Link>
+                  <Link to="/grants" className={classes.link}>Grant</Link>
                 </Button>
                 <Button color="inherit" onClick={handleSignOut}>
                   Sign Out
@@ -127,8 +127,8 @@ function LocationBasedComponents() {
             <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
             <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/create-budget" element={<ProtectedRoute element={<CreateBudget />} />} />
-            <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
+            <Route path="/create-grant" element={<ProtectedRoute element={<CreateBudget />} />} />
+            <Route path="/grants" element={<ProtectedRoute element={<Budgets />} />} />
             <Route path="/rules" element={<ProtectedRoute element={<Rules />} />} />
             <Route path="/create-rules" element={<ProtectedRoute element={<CreateRules />} />} />
           </Routes>
