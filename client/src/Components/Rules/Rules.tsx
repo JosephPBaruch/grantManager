@@ -93,7 +93,6 @@ const Rules = () => {
                   <TableCell>Name</TableCell>
                   <TableCell>Description</TableCell>
                   <TableCell>Type</TableCell>
-                  <TableCell>Aggregator</TableCell>
                   <TableCell>Active</TableCell>
                 </TableRow>
               </TableHead>
@@ -108,7 +107,6 @@ const Rules = () => {
                     <TableCell>{rule.name}</TableCell>
                     <TableCell>{rule.description}</TableCell>
                     <TableCell>{rule.rule_type}</TableCell>
-                    <TableCell>{rule.aggregator}</TableCell>
                     <TableCell>{rule.is_active ? 'Yes' : 'No'}</TableCell>
                   </TableRow>
                 ))}
@@ -129,16 +127,43 @@ const Rules = () => {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px' }}>
-                <Typography variant="h6" noWrap>
-                  {selectedRule ? selectedRule.name : 'Details'}
-                </Typography>
-                <IconButton onClick={toggleDrawer}>
-                  {drawerCollapsed ? <ChevronLeft /> : <ChevronRight />}
-                </IconButton>
-              </div>
+              {!drawerCollapsed && (
+                <div 
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between', 
+                    padding: '8px' 
+                  }}
+                >
+                  <Typography 
+                    variant="h6" 
+                    noWrap 
+                    style={{ textAlign: 'left' }}
+                  >
+                    {selectedRule ? selectedRule.name : 'Details'}
+                  </Typography>
+                </div>
+              )}
+              {drawerCollapsed && (
+                <div 
+                  style={{ 
+                    writingMode: 'vertical-rl', 
+                    textAlign: 'center', 
+                    transform: 'rotate(180deg)', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    flex: 1 
+                  }}
+                >
+                  <Typography variant="h6" noWrap>
+                    {selectedRule ? selectedRule.name : 'Details'}
+                  </Typography>
+                </div>
+              )}
               {!drawerCollapsed && selectedRule && (
-                <div style={{ padding: '16px', overflowY: 'auto' }}>
+                <div style={{ padding: '16px', overflowY: 'auto', flex: 1 }}>
                   <Typography variant="body1" gutterBottom>
                     <strong>Description:</strong> {selectedRule.description}
                   </Typography>
@@ -181,6 +206,20 @@ const Rules = () => {
                   </Typography>
                 </div>
               )}
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  padding: '8px', 
+                  borderTop: '1px solid #ccc', 
+                  marginTop: 'auto' 
+                }}
+              >
+                <IconButton onClick={toggleDrawer}>
+                  {drawerCollapsed ? <ChevronRight /> : <ChevronLeft />}
+                </IconButton>
+              </div>
             </div>
           </Drawer>
         </div>
