@@ -9,12 +9,17 @@ import {
   MenuItem,
 } from '@mui/material';
 
+type User = {
+  id: string;
+  full_name: string;
+};
+
 const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [grantId, setGrantId] = useState(localStorage.getItem("selected_grant_id"));
   const [userId, setUserId] = useState('');
   const [roleType, setRoleType] = useState('');
   const [permissions, setPermissions] = useState<string[]>([]);
-  const [users, setUsers] = useState<{ id: string; full_name: string }[]>([]);
+  const [users, setUsers] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -24,23 +29,29 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
         });
-
+  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+  
         const data = await response.json();
-        setUsers(data.data.map((user: { id: string; full_name: string }) => ({
-          id: user.id,
-          full_name: user.full_name,
-        })));
+        console.log("Fetched data:", data);
+  
+        if (data && Array.isArray(data.data) && data.data.length > 0) {
+          const firstUser = data.data[0];
+          console.log("First data:", firstUser);
+          await setUsers({ id: firstUser.id, full_name: firstUser.full_name });
+        } else {
+          console.error("No users or bad format:", data);
+        }
       } catch (error) {
         console.error('Error fetching users:', error);
       }
     };
-
+  
     fetchUsers();
   }, []);
+  
 
   const handleSubmit = async () => {
     try {
@@ -70,7 +81,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Create Role</DialogTitle>
       <DialogContent>
         <TextField
@@ -84,15 +95,15 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           label="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          select
+        //   select
           fullWidth
           margin="normal"
         >
-          {users.map((user) => (
-            <MenuItem key={user.id} value={user.id}>
-              {user.full_name}
+          {/* {users && (
+            <MenuItem key={users.id} value={users.id}>
+              {users.full_name}
             </MenuItem>
-          ))}
+          )} */}
         </TextField>
         <TextField
           label="Role Type"

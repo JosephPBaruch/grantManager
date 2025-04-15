@@ -53,7 +53,7 @@ function Roles() {
   };
 
   return (
-    <Container maxWidth="sm" className={classes.root}>
+    <Container maxWidth="md" className={classes.root}>
       <Typography variant="h4">
         Roles
       </Typography>
