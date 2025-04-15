@@ -123,7 +123,7 @@ const Rules = () => {
               style: {
                 top: '64px', // Adjust this value to match the height of your header
                 height: 'calc(100% - 64px)', // Adjust height to exclude the header
-                width: drawerCollapsed ? '100px' : '400px', // Collapsed width
+                width: drawerCollapsed ? '50px' : '400px', // Collapsed width
                 overflow: 'hidden',
               },
             }}
