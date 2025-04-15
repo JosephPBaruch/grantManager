@@ -1,16 +1,18 @@
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
-import Transactions from './Components/MakeTransactions';
-import ViewTransactions from './Components/ListTransaction';
-import ListUsers from './Components/ListUsers';
-import CreateUser from './Components/CreateUser';
+import Transactions from './Components/Transactions/MakeTransactions';
+import ViewTransactions from './Components/Transactions/ListTransaction';
+import ListUsers from './Components/Users/ListUsers';
+import CreateUser from './Components/Users/CreateUser';
 import { makeStyles } from '@mui/styles';
 import { AppBar, Toolbar, Typography, Button, CssBaseline, Container } from '@mui/material';
-import SignIn from './Components/SignIn';
-import CreateBudget from './Components/CreateBudget';
-import Budgets from './Components/Budgets';
-import SignUp from './Components/SignUp';
+import SignIn from './Components/Sign/SignIn';
+import CreateBudget from './Components/Budgets/CreateBudget';
+import Budgets from './Components/Budgets/Budgets';
+import SignUp from './Components/Sign/SignUp';
+import Rules from './Components/Rules/Rules'
 import ProtectedRoute from './Components/ProtectedRoute';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import CreateRules from './Components/Rules/CreateRules';
 
 const useStyles = makeStyles({
   root: {
@@ -33,10 +35,10 @@ const useStyles = makeStyles({
     textDecoration: 'none',
     marginRight: '15px',
     '&:hover': {
-      color: '#ffcc00', // Change to desired hover color
+      color: '#ffcc00', 
     },
     '&:active': {
-      color: '#ff9900', // Change to desired active color
+      color: '#ff9900', 
     },
   },
   title: { 
@@ -69,12 +71,20 @@ function LocationBasedComponents() {
   const navigate = useNavigate();
   const classes = useStyles();
   const hideHeaderFooter = ['/', '/sign-up', '/create-budget', '/budgets'].includes(location.pathname);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // Example state for authentication
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [budgetName, setBudgetName] = useState('');
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access_token');
+    setIsAuthenticated(!!accessToken);
+    const storedBudgetName = localStorage.getItem('selected_budget_name');
+    setBudgetName(storedBudgetName || '');
+  }, [location]);
 
   const handleSignOut = () => {
+    localStorage.removeItem('access_token');
     setIsAuthenticated(false);
-    navigate("/")
-    // Add sign-out logic here
+    navigate("/");
   };
 
   return (
@@ -83,24 +93,21 @@ function LocationBasedComponents() {
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              UIdaho Grant Management
+              UIdaho Grant Management {budgetName && `- ${budgetName}`}
             </Typography>
             <Button color="inherit">
-              <Link to="/transactions" className={classes.link}>Make Transaction</Link>
-            </Button>
-            <Button color="inherit">
               <Link to="/list-transactions" className={classes.link}>Transactions</Link>
-            </Button>
-            <Button color="inherit">
-              <Link to="/users" className={classes.link}>Create Users</Link>
             </Button>
             <Button color="inherit">
               <Link to="/list-users" className={classes.link}>Users</Link>
             </Button>
             {isAuthenticated && (
               <>
+              <Button color="inherit">
+                  <Link to="/rules" className={classes.link}>Rules</Link>
+                </Button>
                 <Button color="inherit">
-                  <Link to="/create-budget" className={classes.link}>Change Budget</Link>
+                  <Link to="/budgets" className={classes.link}>Budget</Link>
                 </Button>
                 <Button color="inherit" onClick={handleSignOut}>
                   Sign Out
@@ -116,12 +123,14 @@ function LocationBasedComponents() {
             <Route path="/" element={<SignIn />} />
             <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
             <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
-            {/* <Route path="/list-transactions" element={<ViewTransactions />} /> */}
+            <Route path="/list-transactions" element={<ViewTransactions />} />
             <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
             <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-up" element={<SignUp />} />
             <Route path="/create-budget" element={<ProtectedRoute element={<CreateBudget />} />} />
             <Route path="/budgets" element={<ProtectedRoute element={<Budgets />} />} />
+            <Route path="/rules" element={<ProtectedRoute element={<Rules />} />} />
+            <Route path="/create-rules" element={<ProtectedRoute element={<CreateRules />} />} />
           </Routes>
         </div>
         {!hideHeaderFooter && (

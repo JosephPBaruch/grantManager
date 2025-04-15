@@ -2,6 +2,8 @@ import { Container, Typography, Paper, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   root: {
@@ -34,8 +36,34 @@ function SignIn() {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Fetch Here
-    navigate("/budgets")
+    fetch('http://localhost:8000/api/v1/login/access-token', {
+      method: 'POST',
+      headers: new Headers({
+        'accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }),
+      body: new URLSearchParams({
+        "grant_type": "password",
+        "username": email,
+        "password": password,
+        "scope": "",
+        "client_id": "",
+        "client_secret": ""
+      })
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Error signing in: ' + response.statusText);
+      }
+    }).then((data) => {
+      localStorage.setItem('access_token', data.access_token);
+      toast.success('Signed in successfully!');
+      navigate("/budgets");
+    }).catch((error) => {
+      toast.error('Error signing in: ' + error.message);
+      console.error('Error signing in:', error);
+    });
   };
 
   return (
@@ -72,7 +100,16 @@ function SignIn() {
         >
           Sign In
         </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          className={classes.submitButton}
+          onClick={() => navigate("/sign-up")}
+        >
+          Sign Up
+        </Button>
       </Paper>
+      <ToastContainer />
     </Container>
   );
 }

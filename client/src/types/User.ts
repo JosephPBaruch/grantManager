@@ -1,10 +1,8 @@
 export interface User {
-  id: number;
-  first_name: string;
-  last_name: string;
+  id: string;
+  full_name: string | null;
   email: string;
-  password: string;
   created_at: string;
-  admin: boolean;
-  budgetName: string;
+  is_active: boolean;
+  is_superuser: boolean;
 }

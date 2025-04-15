@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, TextField, Container, Typography } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useStyles = makeStyles({
   form: {
@@ -22,30 +24,31 @@ const useStyles = makeStyles({
 const SignUp: React.FC = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    navigate("/sign-in");
-    // fetch('http://127.0.0.1:8080/api/users/', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password }),
-    // }).then((response) => {
-    //   if (response.ok) {
-    //     console.log('User signed up!');
-    //     navigate("/sign-in");
-    //   } else {
-    //     console.error('Error signing up:', response.statusText);
-    //   }
-    // }).catch((error) => {
-    //   console.error('Error signing up:', error);
-    // });
+    fetch('http://localhost:8000/api/v1/users/signup', {
+      method: 'POST',
+      headers: new Headers({'content-type': 'application/json'}),
+
+      body: JSON.stringify({ "email": email, "password": password, "full_name": fullName }),
+      // mode: 'no-cors', 
+    }).then((response) => {
+      if (response.ok) {
+        console.log('User signed up!');
+        toast.success('Signed up successfully!');
+        navigate("/");
+      } else {
+        console.error('Error signing up:', response.statusText);
+        toast.error('Error signing up: ' + response.statusText);
+      }
+    }).catch((error) => {
+      console.error('Error signing up:', error);
+      toast.error('Error signing up: ' + error.message);
+    });
   };
 
   return (
@@ -58,18 +61,9 @@ const SignUp: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit} className={classes.form}>
         <TextField
-          label="First Name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          fullWidth
-          margin="normal"
-          required
-          className={classes.textField}
-        />
-        <TextField
-          label="Last Name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
+          label="Full Name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
           fullWidth
           margin="normal"
           required
@@ -98,7 +92,11 @@ const SignUp: React.FC = () => {
         <Button type="submit" variant="contained" color="primary" fullWidth className={classes.button}>
           Sign Up
         </Button>
+        <Button variant="outlined" color="secondary" fullWidth className={classes.button} onClick={() => navigate("/")}>
+          Sign In
+        </Button>
       </form>
+      <ToastContainer />
     </Container>
   );
 };

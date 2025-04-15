@@ -1,4 +1,4 @@
-import { Button, Container, TextField, Typography } from "@mui/material";
+import { Button, Container, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useState } from "react";
 
@@ -40,9 +40,6 @@ function Transactions() {
 
   return (
     <Container maxWidth="sm">
-      <Typography style={{paddingTop: '20px'}} variant="h4" component="h1" gutterBottom>
-        Transactions
-      </Typography>
       <form className={classes.form}>
         <TextField
           label="Amount"
