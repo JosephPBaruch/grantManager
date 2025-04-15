@@ -59,7 +59,7 @@ function SignIn() {
     }).then((data) => {
       localStorage.setItem('access_token', data.access_token);
       toast.success('Signed in successfully!');
-      navigate("/budgets");
+      navigate("/grants");
     }).catch((error) => {
       toast.error('Error signing in: ' + error.message);
       console.error('Error signing in:', error);

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
-import Transactions from './Components/Transactions/MakeTransactions';
-import ViewTransactions from './Components/Transactions/ListTransaction';
+import Transactions from './Components/Expenses/CreateExpenses';
+import ViewTransactions from './Components/Expenses/Expenses';
 import ListUsers from './Components/Users/ListUsers';
 import CreateUser from './Components/Users/CreateUser';
 import { makeStyles } from '@mui/styles';
@@ -13,6 +13,8 @@ import Rules from './Components/Rules/Rules'
 import ProtectedRoute from './Components/ProtectedRoute';
 import { useState, useEffect } from 'react';
 import CreateRules from './Components/Rules/CreateRules';
+import Approvals from './Components/Approvals';
+import Categories from './Components/Categories';
 
 const useStyles = makeStyles({
   root: {
@@ -93,26 +95,32 @@ function LocationBasedComponents() {
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar>
             <Typography variant="h6" className={classes.title}>
-              UIdaho Grant Management {budgetName && `- ${budgetName}`}
+              UIGM {budgetName && `- ${budgetName}`}
             </Typography>
-            <Button color="inherit">
-              <Link to="/list-transactions" className={classes.link}>Transactions</Link>
-            </Button>
-            <Button color="inherit">
-              <Link to="/list-users" className={classes.link}>Users</Link>
-            </Button>
             {isAuthenticated && (
-              <>
+            <>
               <Button color="inherit">
-                  <Link to="/rules" className={classes.link}>Rules</Link>
-                </Button>
-                <Button color="inherit">
-                  <Link to="/grants" className={classes.link}>Grant</Link>
-                </Button>
-                <Button color="inherit" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </>
+                <Link to="/expenses" className={classes.link}>Expenses</Link>
+              </Button>
+              <Button color="inherit">
+                <Link to="/approvals" className={classes.link}>Approvals</Link>
+              </Button>
+              <Button color="inherit">
+                <Link to="/users" className={classes.link}>Users</Link>
+              </Button>
+              <Button color="inherit">
+                <Link to="/categories" className={classes.link}>Categories</Link>
+              </Button>
+              <Button color="inherit">
+                <Link to="/rules" className={classes.link}>Rules</Link>
+              </Button>
+              <Button color="inherit">
+                <Link to="/grants" className={classes.link}>Grant</Link>
+              </Button>
+              <Button color="inherit" onClick={handleSignOut}>
+                Sign Out
+              </Button>
+            </>
             )}
           </Toolbar>
         </AppBar>
@@ -121,16 +129,23 @@ function LocationBasedComponents() {
         <div className={classes.content}>
           <Routes>
             <Route path="/" element={<SignIn />} />
-            <Route path="/transactions" element={<ProtectedRoute element={<Transactions />} />} />
-            <Route path="/list-transactions" element={<ProtectedRoute element={<ViewTransactions />} />} />
-            <Route path="/list-transactions" element={<ViewTransactions />} />
-            <Route path="/list-users" element={<ProtectedRoute element={<ListUsers />} />} />
-            <Route path="/users" element={<ProtectedRoute element={<CreateUser />} />} />
             <Route path="/sign-up" element={<SignUp />} />
-            <Route path="/create-grant" element={<ProtectedRoute element={<CreateBudget />} />} />
+
+            <Route path="/expenses" element={<ProtectedRoute element={<ViewTransactions />} />} />
+            <Route path="/create-expenses" element={<ProtectedRoute element={<Transactions />} />} />
+            
+            <Route path="/users" element={<ProtectedRoute element={<ListUsers />} />} />
+            <Route path="/create-users" element={<ProtectedRoute element={<CreateUser />} />} />
+
             <Route path="/grants" element={<ProtectedRoute element={<Budgets />} />} />
+            <Route path="/create-grant" element={<ProtectedRoute element={<CreateBudget />} />} />
+
             <Route path="/rules" element={<ProtectedRoute element={<Rules />} />} />
             <Route path="/create-rules" element={<ProtectedRoute element={<CreateRules />} />} />
+
+            <Route path="/approvals" element={<ProtectedRoute element={<Approvals />} />} />
+
+            <Route path="/categories" element={<ProtectedRoute element={<Categories />} />} />
           </Routes>
         </div>
         {!hideHeaderFooter && (
