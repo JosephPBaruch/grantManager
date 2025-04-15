@@ -24,6 +24,10 @@ const CreateRules = () => {
   const [target, setTarget] = useState('');
   const [aggregator, setAggregator] = useState('MAX');
   const [type, setType] = useState('int');
+  const [grantID, setGrantID] = useState('');
+  const [ruleType, setRuleType] = useState('expense');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [filters, setFilters] = useState([{ field: '', operator: '=', value: '' }]);
 
   const fetchRules = async () => {
     const token = localStorage.getItem('token');
@@ -128,16 +132,21 @@ const CreateRules = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          Name: name,
-          Description: description,
-          Table: table,
-          Enabled: enabled
+          grant_id: grantID,
+          name,
+          description,
+          rule_type: ruleType,
+          aggregator,
+          error_message: errorMessage,
+          is_active: enabled,
+          filters,
+          conditions // Ensure conditions are included in the request body
         })
       });
 
       if (response.ok) {
         toast.success('Rule created successfully');
-        fetchRules()
+        fetchRules();
       } else {
         toast.error('Failed to create rule');
         console.error('Failed to create rule');
@@ -287,6 +296,13 @@ const CreateRules = () => {
       )}
           <form>
             <TextField
+              label="Grant ID"
+              value={grantID}
+              onChange={(e) => setGrantID(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
               label="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -301,11 +317,24 @@ const CreateRules = () => {
               margin="normal"
             />
             <TextField
-              label="Table"
-              value={table}
-              onChange={(e) => setTable(e.target.value)}
+              label="Rule Type"
+              value={ruleType}
+              onChange={(e) => setRuleType(e.target.value)}
               fullWidth
-              placeholder='budget'
+              margin="normal"
+            />
+            <TextField
+              label="Aggregator"
+              value={aggregator}
+              onChange={(e) => setAggregator(e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Error Message"
+              value={errorMessage}
+              onChange={(e) => setErrorMessage(e.target.value)}
+              fullWidth
               margin="normal"
             />
             <Button
@@ -314,6 +343,112 @@ const CreateRules = () => {
               onClick={() => setEnabled(!enabled)}
             >
               {enabled ? 'Disable' : 'Enable'}
+            </Button>
+            <Typography variant="h6" gutterBottom>
+              Filters
+            </Typography>
+            {filters.map((filter, index) => (
+              <div key={index}>
+                <TextField
+                  label="Field"
+                  value={filter.field}
+                  onChange={(e) => {
+                    const newFilters = [...filters];
+                    newFilters[index].field = e.target.value;
+                    setFilters(newFilters);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Operator"
+                  value={filter.operator}
+                  onChange={(e) => {
+                    const newFilters = [...filters];
+                    newFilters[index].operator = e.target.value;
+                    setFilters(newFilters);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Value"
+                  value={filter.value}
+                  onChange={(e) => {
+                    const newFilters = [...filters];
+                    newFilters[index].value = e.target.value;
+                    setFilters(newFilters);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+              </div>
+            ))}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setFilters([...filters, { field: '', operator: '=', value: '' }])}
+            >
+              Add Filter
+            </Button>
+            <Typography variant="h6" gutterBottom>
+              Conditions
+            </Typography>
+            {conditions.map((condition, index) => (
+              <div key={index}>
+                <TextField
+                  label="Field"
+                  value={condition.field}
+                  onChange={(e) => {
+                    const newConditions = [...conditions];
+                    newConditions[index].field = e.target.value;
+                    setConditions(newConditions);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Operator"
+                  value={condition.operator}
+                  onChange={(e) => {
+                    const newConditions = [...conditions];
+                    newConditions[index].operator = e.target.value;
+                    setConditions(newConditions);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Value"
+                  value={condition.value}
+                  onChange={(e) => {
+                    const newConditions = [...conditions];
+                    newConditions[index].value = e.target.value;
+                    setConditions(newConditions);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Order"
+                  type="number"
+                  value={condition.order}
+                  onChange={(e) => {
+                    const newConditions = [...conditions];
+                    newConditions[index].order = Number(e.target.value);
+                    setConditions(newConditions);
+                  }}
+                  fullWidth
+                  margin="normal"
+                />
+              </div>
+            ))}
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => setConditions([...conditions, { field: '', operator: '=', value: '', order: 0 }])}
+            >
+              Add Condition
             </Button>
           </form>
           <Button variant="contained" color="primary" onClick={handleSubmit}>
