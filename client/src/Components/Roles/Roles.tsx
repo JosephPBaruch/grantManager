@@ -1,8 +1,8 @@
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
-import { Role } from "../types/Roles";
-import CreateRoles from "./Roles/CreateRoles";
+import { Role } from "../../types/Roles";
+import CreateRoles from "./CreateRoles";
 
 const useStyles = makeStyles({
   root: {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +14,33 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const [userId, setUserId] = useState('');
   const [roleType, setRoleType] = useState('');
   const [permissions, setPermissions] = useState<string[]>([]);
+  const [users, setUsers] = useState<{ id: string; full_name: string }[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/users/?skip=0&limit=100', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUsers(data.data.map((user: { id: string; full_name: string }) => ({
+          id: user.id,
+          full_name: user.full_name,
+        })));
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -57,9 +84,16 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           label="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
+          select
           fullWidth
           margin="normal"
-        />
+        >
+          {users.map((user) => (
+            <MenuItem key={user.id} value={user.id}>
+              {user.full_name}
+            </MenuItem>
+          ))}
+        </TextField>
         <TextField
           label="Role Type"
           value={roleType}

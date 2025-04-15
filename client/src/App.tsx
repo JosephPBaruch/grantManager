@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import CreateRules from './Components/Rules/CreateRules';
 import Approvals from './Components/Approvals';
 import Categories from './Components/Categories/Categories';
-import Roles from './Components/Roles';
+import Roles from './Components/Roles/Roles';
 
 const useStyles = makeStyles({
   root: {
