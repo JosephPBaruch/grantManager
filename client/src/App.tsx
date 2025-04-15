@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import CreateRules from './Components/Rules/CreateRules';
 import Approvals from './Components/Approvals';
 import Categories from './Components/Categories/Categories';
+import Roles from './Components/Roles';
 
 const useStyles = makeStyles({
   root: {
@@ -109,6 +110,9 @@ function LocationBasedComponents() {
                 <Link to="/users" className={classes.link}>Users</Link>
               </Button>
               <Button color="inherit">
+                <Link to="/roles" className={classes.link}>Roles</Link>
+              </Button>
+              <Button color="inherit">
                 <Link to="/categories" className={classes.link}>Categories</Link>
               </Button>
               <Button color="inherit">
@@ -146,6 +150,8 @@ function LocationBasedComponents() {
             <Route path="/approvals" element={<ProtectedRoute element={<Approvals />} />} />
 
             <Route path="/categories" element={<ProtectedRoute element={<Categories />} />} />
+
+            <Route path="/roles" element={<ProtectedRoute element={<Roles />} />} />
           </Routes>
         </div>
         {!hideHeaderFooter && (
