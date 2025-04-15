@@ -1,7 +1,8 @@
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
-import { Category } from "../types/Categories";
+import { Category } from "../../types/Categories";
+import CreateCategories from "./CreateCategories"; 
 
 const useStyles = makeStyles({
   root: {
@@ -43,6 +44,7 @@ function Categories() {
       <Typography variant="h4" component="h1" gutterBottom>
         Categories
       </Typography>
+      <CreateCategories />
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="categories table">
           <TableHead>

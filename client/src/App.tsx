@@ -14,7 +14,7 @@ import ProtectedRoute from './Components/ProtectedRoute';
 import { useState, useEffect } from 'react';
 import CreateRules from './Components/Rules/CreateRules';
 import Approvals from './Components/Approvals';
-import Categories from './Components/Categories';
+import Categories from './Components/Categories/Categories';
 
 const useStyles = makeStyles({
   root: {
