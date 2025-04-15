@@ -24,7 +24,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           headers: {
             'Content-Type': 'application/json',
             accept: 'application/json',
-            Authorization: 'Bearer YOUR_TOKEN_HERE', // Replace with actual token
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
           body: JSON.stringify({ permissions }),
         }

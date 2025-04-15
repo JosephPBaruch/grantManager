@@ -1,7 +1,8 @@
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Role } from "../types/Roles";
+import CreateRoles from "./Roles/CreateRoles";
 
 const useStyles = makeStyles({
   root: {
@@ -20,35 +21,45 @@ const useStyles = makeStyles({
 function Roles() {
   const classes = useStyles();
   const [roles, setRoles] = useState<Role[]>([]); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
+        method: 'GET',
+        headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setRoles(data.data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
-          method: 'GET',
-          headers: {
-              'accept': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem("access_token")}`
-          }
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setRoles(data.data);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-
     fetchRoles();
   }, []);
+
+  const handleDialogOpen = () => setIsDialogOpen(true);
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    fetchRoles();
+  };
 
   return (
     <Container maxWidth="sm" className={classes.root}>
       <Typography variant="h4">
         Roles
       </Typography>
+      <Button variant="contained" color="primary" onClick={handleDialogOpen}>
+        Create Role
+      </Button>
       <TableContainer component={Paper} className={classes.tableContainer}>
         <Table>
           <TableHead>
@@ -75,6 +86,7 @@ function Roles() {
           </TableBody>
         </Table>
       </TableContainer>
+      <CreateRoles open={isDialogOpen} onClose={handleDialogClose} />
     </Container>
   );
 }

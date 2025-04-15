@@ -121,7 +121,9 @@ function LocationBasedComponents() {
               <Button color="inherit">
                 <Link to="/grants" className={classes.link}>Grant</Link>
               </Button>
-              <Button color="inherit" onClick={handleSignOut}>
+              <Button variant="outlined" color="secondary" 
+                // styles={{background}}
+                onClick={handleSignOut}>
                 Sign Out
               </Button>
             </>
