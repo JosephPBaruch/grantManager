@@ -15,11 +15,58 @@ from app.models import (
     GrantApprovalPublic,
     GrantApprovalsPublic,
     GrantExpense,
+    GrantExpensesPublic,
+    GrantRole,
 )
 from app.permissions import GrantPermission, has_grant_permission
 
 router = APIRouter(prefix="/grant-approvals", tags=["Grant Approvals"])
 logger = getLogger("uvicorn.error")
+
+
+@router.post("/pending-expenses", response_model=GrantExpensesPublic)
+def get_expenses_without_requests(
+    session: SessionDep,
+    current_user: CurrentUser,
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """
+    Returns a list of expenses that do not have any grant approval requests.
+    Regular users can only see expenses for their grants, superusers can see all expenses.
+    """
+
+    if current_user.is_superuser:
+        statement = (
+            select(GrantExpense)
+            .join(
+                GrantApproval, GrantExpense.id == GrantApproval.expense_id, isouter=True
+            )
+            .where(GrantApproval.id.is_(None))
+            .offset(skip)
+            .limit(limit)
+        )
+    else:
+        # Subquery to find grant_ids where the user has the 'approve_expenses' permission
+        subquery = (
+            select(GrantRole.grant_id)
+            .where(GrantRole.user_id == current_user.id)
+            .where(GrantRole.permissions.any(GrantPermission.APPROVE_EXPENSES.value))
+        )
+        # Main query to select expenses belonging to those grants and having no approvals
+        statement = (
+            select(GrantExpense)
+            .join(
+                GrantApproval, GrantExpense.id == GrantApproval.expense_id, isouter=True
+            )
+            .where(GrantExpense.grant_id.in_(subquery))
+            .where(GrantApproval.id.is_(None))
+            .offset(skip)
+            .limit(limit)
+        )
+
+    expenses = session.exec(statement).all()
+    return GrantExpensesPublic(data=expenses, count=len(expenses))
 
 
 @router.get("/", response_model=GrantApprovalsPublic)
@@ -30,24 +77,35 @@ def read_grant_approvals(
     limit: int = 100,
 ) -> Any:
     """
-    Returns a list of grant approvals. Regular users can only see approvals for their grants,
+    Returns a list of grant approvals. Regular users can only see approvals for
+    the grants they have the GrantPermission.APPROVE_EXPENSES on,
     superusers can see all approvals.
     """
+
     if current_user.is_superuser:
         count_statement = select(func.count()).select_from(GrantApproval)
         statement = select(GrantApproval).offset(skip).limit(limit)
     else:
-        # Get approvals for grants owned by the current user
+        # Subquery to find grant_ids where the user has the 'APPROVE_EXPENSES' permission
+        subquery = (
+            select(GrantRole.grant_id)
+            .where(GrantRole.user_id == current_user.id)
+            .where(GrantRole.permissions.any(GrantPermission.APPROVE_EXPENSES.value))
+        )
+
+        # Count statement for approvals in allowed grants
         count_statement = (
             select(func.count())
             .select_from(GrantApproval)
-            .join(Grant, GrantApproval.grant_id == Grant.id)
-            .where(Grant.owner_id == current_user.id)
+            .join(GrantExpense, GrantApproval.expense_id == GrantExpense.id)
+            .where(GrantExpense.grant_id.in_(subquery))
         )
+
+        # Main query to select approvals belonging to those grants
         statement = (
             select(GrantApproval)
-            .join(Grant, GrantApproval.grant_id == Grant.id)
-            .where(Grant.owner_id == current_user.id)
+            .join(GrantExpense, GrantApproval.expense_id == GrantExpense.id)
+            .where(GrantExpense.grant_id.in_(subquery))
             .offset(skip)
             .limit(limit)
         )
@@ -63,38 +121,40 @@ async def create_grant_approval(
     *,
     session: SessionDep,
     approval_in: GrantApprovalBase,
-    grant_id: str,
     current_user: CurrentUser,
 ) -> Any:
     """
     Create a new grant approval.
     """
-    # Verify that the user has access to the grant
+
+    # Validate that the expense exists
+    statement = select(GrantExpense).where(GrantExpense.id == approval_in.expense_id)
+    selected_expense = session.exec(statement).first()
+    if not selected_expense:
+        raise HTTPException(status_code=404, detail="Expense not found")
+
+    # Verify that the expense is not already approved
+    existing_approval = session.exec(
+        select(GrantApproval).where(GrantApproval.expense_id == approval_in.expense_id)
+    ).first()
+    if existing_approval:
+        raise HTTPException(
+            status_code=400, detail="Expense already has an approval request"
+        )
+    # Verify that the user has permission to approve expenses
+    grant_id = selected_expense.grant_id
     permission = await has_grant_permission(
         session=session,
-        grant_id=UUID(grant_id),
+        grant_id=grant_id,
         permission=GrantPermission.APPROVE_EXPENSES,
         user_id=current_user.id,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    grant = session.get(Grant, UUID(grant_id))
-    if not grant:
-        raise HTTPException(status_code=404, detail="Grant not found")
-
-    # If there's an expense, verify it belongs to the grant
-    if approval_in.expense_id:
-        expense = session.get(GrantExpense, approval_in.expense_id)
-        if not expense:
-            raise HTTPException(status_code=404, detail="Expense not found")
-        if expense.id != grant.id:
-            raise HTTPException(
-                status_code=400, detail="Expense does not belong to the grant"
-            )
-
-    approval = GrantApproval.model_validate(approval_in)
-    approval.approver_id = current_user.id
+    approval = GrantApproval(
+        approver_id=current_user.id, **approval_in.model_dump(exclude_unset=True)
+    )
 
     try:
         session.add(approval)

@@ -11,20 +11,19 @@ DEFAULT_ROLE_PERMISSIONS = {
         GrantPermission.APPROVE_EXPENSES,
         GrantPermission.CREATE_RULES,
         GrantPermission.MANAGE_ROLES,
-        GrantPermission.VIEW_BUDGET,
         GrantPermission.VIEW_EXPENSES,
         GrantPermission.SUBMIT_EXPENSES,
         GrantPermission.MANAGE_GRANT,
         GrantPermission.EDIT_EXPENSES,
         GrantPermission.ARCHIVE_GRANT,
         GrantPermission.VIEW_GRANT,
+        GrantPermission.EDIT_GRANT,
     ],
     GrantRoleType.ADMIN: [
         GrantPermission.APPROVE_EXPENSES,
         GrantPermission.EDIT_EXPENSES,
         GrantPermission.CREATE_RULES,
         GrantPermission.MANAGE_ROLES,
-        GrantPermission.VIEW_BUDGET,
         GrantPermission.VIEW_EXPENSES,
         GrantPermission.SUBMIT_EXPENSES,
         GrantPermission.MANAGE_GRANT,
@@ -33,6 +32,7 @@ DEFAULT_ROLE_PERMISSIONS = {
     GrantRoleType.USER: [
         GrantPermission.VIEW_EXPENSES,
         GrantPermission.SUBMIT_EXPENSES,
+        GrantPermission.VIEW_GRANT,
     ],
 }
 
