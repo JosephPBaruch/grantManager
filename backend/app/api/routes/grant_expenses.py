@@ -88,10 +88,7 @@ async def create_grant_expense(
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     # Create the expense
-    expense = GrantExpense(
-        created_by=current_user.id, status="pending", **grant_expense.model_dump()
-    )
-    expense.created_by = current_user.id
+    expense = GrantExpense(created_by=current_user.id, **grant_expense.model_dump())
 
     # Invalid Rules will be caught by the trigger, and expense will not be created
     try:
