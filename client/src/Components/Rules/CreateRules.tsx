@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Container, TextField, Typography, Box } from '@mui/material';
+import { Button, Container, TextField, Typography, Box, Select, MenuItem } from '@mui/material';
 import { toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -84,14 +84,23 @@ const CreateRules = () => {
           placeholder="Enter the rule type (e.g., expense)"
           fullWidth
         />
-        <TextField
-          label="Aggregator"
-          name="aggregator"
-          value={formData.aggregator}
-          onChange={handleChange}
-          placeholder="Enter the aggregator (e.g., SUM, AVG)"
-          fullWidth
-        />
+        <Box>
+          <Typography>Aggregator</Typography>
+          <Select
+            name="aggregator"
+            value={formData.aggregator}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                aggregator: e.target.value,
+              })
+            }
+            fullWidth
+          >
+            <MenuItem value="MAX">MAX</MenuItem>
+            <MenuItem value="SUM">SUM</MenuItem>
+          </Select>
+        </Box>
         <TextField
           label="Error Message"
           name="error_message"
@@ -113,19 +122,27 @@ const CreateRules = () => {
           placeholder="Enter the filter field (e.g., amount)"
           fullWidth
         />
-        <TextField
-          label="Filter Operator"
-          name="filters[0].operator"
-          value={formData.filters[0].operator}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              filters: [{ ...formData.filters[0], operator: e.target.value }],
-            })
-          }
-          placeholder="Enter the filter operator (e.g., =, >, <)"
-          fullWidth
-        />
+        <Box>
+          <Typography>Filter Operator</Typography>
+          <Select
+            name="filters[0].operator"
+            value={formData.filters[0].operator}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                filters: [{ ...formData.filters[0], operator: e.target.value }],
+              })
+            }
+            fullWidth
+          >
+            <MenuItem value="=">=</MenuItem>
+            <MenuItem value="!=">!=</MenuItem>
+            <MenuItem value=">">&gt;</MenuItem>
+            <MenuItem value="<">&lt;</MenuItem>
+            <MenuItem value=">=">&gt;=</MenuItem>
+            <MenuItem value="<=">&lt;=</MenuItem>
+          </Select>
+        </Box>
         <TextField
           label="Filter Value"
           name="filters[0].value"
@@ -152,19 +169,27 @@ const CreateRules = () => {
           placeholder="Enter the condition field (e.g., category)"
           fullWidth
         />
-        <TextField
-          label="Condition Operator"
-          name="conditions[0].operator"
-          value={formData.conditions[0].operator}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              conditions: [{ ...formData.conditions[0], operator: e.target.value }],
-            })
-          }
-          placeholder="Enter the condition operator (e.g., =, >, <)"
-          fullWidth
-        />
+        <Box>
+          <Typography>Condition Operator</Typography>
+          <Select
+            name="conditions[0].operator"
+            value={formData.conditions[0].operator}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                conditions: [{ ...formData.conditions[0], operator: e.target.value }],
+              })
+            }
+            fullWidth
+          >
+            <MenuItem value="=">=</MenuItem>
+            <MenuItem value="!=">!=</MenuItem>
+            <MenuItem value=">">&gt;</MenuItem>
+            <MenuItem value="<">&lt;</MenuItem>
+            <MenuItem value=">=">&gt;=</MenuItem>
+            <MenuItem value="<=">&lt;=</MenuItem>
+          </Select>
+        </Box>
         <TextField
           label="Condition Value"
           name="conditions[0].value"
