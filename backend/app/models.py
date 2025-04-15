@@ -330,7 +330,7 @@ class GrantApprovalBase(SQLModel):
     expense_id: Optional[uuid.UUID] = Field(
         default=None, foreign_key="grant_expense.id"
     )
-    status: ApprovalStatus = Field(default=ApprovalStatus.APPROVED)
+    status: ApprovalStatus = Field(default="APPROVED")
     comments: Optional[str] = Field(default=None)
 
 
