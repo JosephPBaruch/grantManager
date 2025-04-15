@@ -11,7 +11,8 @@ const CreateCategories: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked; // Explicitly cast to HTMLInputElement
     setFormData({
       ...formData,
       [name]: type === 'checkbox' ? checked : value,
