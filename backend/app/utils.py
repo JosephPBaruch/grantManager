@@ -121,3 +121,9 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except Exception:
         return None
+
+
+def get_utc_now():
+    """Get the current UTC time."""
+    return datetime.now(timezone.utc)
+
