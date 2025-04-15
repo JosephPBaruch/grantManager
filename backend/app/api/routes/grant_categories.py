@@ -1,13 +1,18 @@
 from logging import getLogger
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from psycopg.errors import DatabaseError
 from sqlalchemy.exc import DatabaseError as SQL_ERR
 from sqlmodel import func, select
 
-from app.api.deps import SessionDep, get_current_active_superuser
-from app.models import GrantCategory, GrantCategoryBase, GrantCategoryPublic, GrantCategoriesPublic
+from app.api.deps import CurrentSuperUser, SessionDep
+from app.models import (
+    GrantCategoriesPublic,
+    GrantCategory,
+    GrantCategoryBase,
+    GrantCategoryPublic,
+)
 
 router = APIRouter(prefix="/grant-categories", tags=["Grant Categories"])
 logger = getLogger("uvicorn.error")
@@ -18,7 +23,6 @@ def read_grant_categories(
     session: SessionDep,
     skip: int = 0,
     limit: int = 100,
-    current_user=Depends(get_current_active_superuser),
 ) -> Any:
     """
     Returns a list of all grant categories.
@@ -37,7 +41,6 @@ def create_grant_category(
     *,
     session: SessionDep,
     category_in: GrantCategoryBase,
-    current_user=Depends(get_current_active_superuser),
 ) -> Any:
     """
     Create a new grant category.
@@ -65,7 +68,6 @@ def read_grant_category(
     *,
     session: SessionDep,
     category_id: str,
-    current_user=Depends(get_current_active_superuser),
 ) -> Any:
     """
     Get grant category by ID.
@@ -82,7 +84,7 @@ def update_grant_category(
     session: SessionDep,
     category_id: str,
     category_in: GrantCategoryBase,
-    current_user=Depends(get_current_active_superuser),
+    current_user: CurrentSuperUser,
 ) -> Any:
     """
     Update a grant category.
@@ -116,7 +118,7 @@ def delete_grant_category(
     *,
     session: SessionDep,
     category_id: str,
-    current_user=Depends(get_current_active_superuser),
+    current_user: CurrentSuperUser,
 ) -> Any:
     """
     Delete a grant category.
@@ -126,4 +128,4 @@ def delete_grant_category(
         raise HTTPException(status_code=404, detail="Grant category not found")
     session.delete(category)
     session.commit()
-    return {"message": "Grant category deleted successfully"} 
+    return {"message": "Grant category deleted successfully"}

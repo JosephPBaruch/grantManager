@@ -1,8 +1,6 @@
 services:
   db:
     image: '${DOCKER_IMAGE_POSTGRES?Variable not set}:${TAG-latest}'
-    build:
-      context: ./pg
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -28,6 +26,8 @@ services:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     build:
       context: ./backend
+      args:
+        ENVIRONMENT: ${ENVIRONMENT}
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +56,7 @@ services:
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    
     restart: always
     ports:
       - "8000:8000"
@@ -87,14 +88,16 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
 
     volumes:
-      - ./backend/app:/app/app
+      - type: bind
+        source: ./backend/app
+        target: /app/app
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
       interval: 10s
       timeout: 5s
       retries: 5
-
+    working_dir: /app
     build:
       context: ./backend
       args:

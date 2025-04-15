@@ -2,3 +2,4 @@
 .obsidian/workspace.json
 postgres/data
 .cursor/
+.env

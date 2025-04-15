@@ -1,20 +1,22 @@
 from logging import getLogger
 from typing import Any
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from psycopg.errors import DatabaseError
 from sqlalchemy.exc import DatabaseError as SQL_ERR
 from sqlmodel import func, select
 
-from app.api.deps import SessionDep, get_current_active_superuser, get_current_active_user
+from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    Grant,
     GrantApproval,
     GrantApprovalBase,
     GrantApprovalPublic,
     GrantApprovalsPublic,
-    Grant,
     GrantExpense,
 )
+from app.permissions import GrantPermission, has_grant_permission
 
 router = APIRouter(prefix="/grant-approvals", tags=["Grant Approvals"])
 logger = getLogger("uvicorn.error")
@@ -23,9 +25,9 @@ logger = getLogger("uvicorn.error")
 @router.get("/", response_model=GrantApprovalsPublic)
 def read_grant_approvals(
     session: SessionDep,
+    current_user: CurrentUser,
     skip: int = 0,
     limit: int = 100,
-    current_user=Depends(get_current_active_user),
 ) -> Any:
     """
     Returns a list of grant approvals. Regular users can only see approvals for their grants,
@@ -57,17 +59,27 @@ def read_grant_approvals(
 
 
 @router.post("/", response_model=GrantApprovalPublic)
-def create_grant_approval(
+async def create_grant_approval(
     *,
     session: SessionDep,
     approval_in: GrantApprovalBase,
-    current_user=Depends(get_current_active_user),
+    grant_id: str,
+    current_user: CurrentUser,
 ) -> Any:
     """
     Create a new grant approval.
     """
     # Verify that the user has access to the grant
-    grant = session.get(Grant, approval_in.grant_id)
+    permission = await has_grant_permission(
+        session=session,
+        grant_id=UUID(grant_id),
+        permission=GrantPermission.APPROVE_EXPENSES,
+        user_id=current_user.id,
+    )
+    if not permission:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    grant = session.get(Grant, UUID(grant_id))
     if not grant:
         raise HTTPException(status_code=404, detail="Grant not found")
 
@@ -76,8 +88,10 @@ def create_grant_approval(
         expense = session.get(GrantExpense, approval_in.expense_id)
         if not expense:
             raise HTTPException(status_code=404, detail="Expense not found")
-        if expense.grant_id != grant.id:
-            raise HTTPException(status_code=400, detail="Expense does not belong to the grant")
+        if expense.id != grant.id:
+            raise HTTPException(
+                status_code=400, detail="Expense does not belong to the grant"
+            )
 
     approval = GrantApproval.model_validate(approval_in)
     approval.approver_id = current_user.id
@@ -99,11 +113,11 @@ def create_grant_approval(
 
 
 @router.get("/{approval_id}", response_model=GrantApprovalPublic)
-def read_grant_approval(
+async def read_grant_approval(
     *,
     session: SessionDep,
     approval_id: str,
-    current_user=Depends(get_current_active_user),
+    current_user: CurrentUser,
 ) -> Any:
     """
     Get grant approval by ID.
@@ -112,21 +126,28 @@ def read_grant_approval(
     if not approval:
         raise HTTPException(status_code=404, detail="Grant approval not found")
 
+    expense = session.get(GrantExpense, UUID(approval_id))
+
     # Verify that the user has access to the grant
-    grant = session.get(Grant, approval.grant_id)
-    if not current_user.is_superuser and grant.owner_id != current_user.id:
+    permission = await has_grant_permission(
+        session=session,
+        grant_id=expense.grant_id,
+        permission=GrantPermission.APPROVE_EXPENSES,
+        user_id=current_user.id,
+    )
+    if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     return approval
 
 
 @router.put("/{approval_id}", response_model=GrantApprovalPublic)
-def update_grant_approval(
+async def update_grant_approval(
     *,
     session: SessionDep,
     approval_id: str,
     approval_in: GrantApprovalBase,
-    current_user=Depends(get_current_active_user),
+    current_user: CurrentUser,
 ) -> Any:
     """
     Update a grant approval.
@@ -135,8 +156,18 @@ def update_grant_approval(
     if not approval:
         raise HTTPException(status_code=404, detail="Grant approval not found")
 
+    expense = session.get(GrantExpense, UUID(approval_id))
+
     # Verify that the user has access to the grant
-    grant = session.get(Grant, approval.grant_id)
+    grant = session.get(Grant, expense.grant_id)
+    permission = await has_grant_permission(
+        session=session,
+        grant_id=expense.grant_id,
+        permission=GrantPermission.EDIT_EXPENSES,
+        user_id=current_user.id,
+    )
+    if not permission:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
     if not current_user.is_superuser and grant.owner_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
@@ -165,7 +196,7 @@ def delete_grant_approval(
     *,
     session: SessionDep,
     approval_id: str,
-    current_user=Depends(get_current_active_superuser),
+    current_user: CurrentUser,
 ) -> Any:
     """
     Delete a grant approval.
@@ -173,6 +204,16 @@ def delete_grant_approval(
     approval = session.get(GrantApproval, approval_id)
     if not approval:
         raise HTTPException(status_code=404, detail="Grant approval not found")
+    # Verify that the user has access to the grant
+    expense = session.get(GrantExpense, UUID(approval_id))
+    grant = session.get(Grant, expense.grant_id)
+    if not current_user.is_superuser and grant.owner_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    approval = session.get(GrantApproval, approval_id)
+
+    if not approval:
+        raise HTTPException(status_code=404, detail="Grant approval not found")
     session.delete(approval)
     session.commit()
-    return {"message": "Grant approval deleted successfully"} 
+    return {"message": "Grant approval deleted successfully"}

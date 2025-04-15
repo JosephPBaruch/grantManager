@@ -1,8 +1,8 @@
-"""Added Budgets
+"""Update exp Model3
 
-Revision ID: 91ae20efcb73
-Revises: 24de618a7ad9
-Create Date: 2025-03-23 18:06:55.694609
+Revision ID: b1dc3ba1b856
+Revises: 205996f4fb44
+Create Date: 2025-04-14 18:26:50.560592
 
 """
 from typing import Sequence, Union
@@ -14,8 +14,8 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision: str = '91ae20efcb73'
-down_revision: Union[str, None] = '24de618a7ad9'
+revision: str = 'b1dc3ba1b856'
+down_revision: Union[str, None] = '205996f4fb44'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
