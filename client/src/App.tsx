@@ -13,9 +13,10 @@ import Rules from './Components/Rules/Rules'
 import ProtectedRoute from './Components/ProtectedRoute';
 import { useState, useEffect } from 'react';
 import CreateRules from './Components/Rules/CreateRules';
-import Approvals from './Components/Approvals';
+import Approvals from './Components/Approvals/Approvals';
 import Categories from './Components/Categories/Categories';
 import Roles from './Components/Roles/Roles';
+import CreateApprovals from './Components/Approvals/CreateApproval';
 
 const useStyles = makeStyles({
   root: {
@@ -122,7 +123,6 @@ function LocationBasedComponents() {
                 <Link to="/grants" className={classes.link}>Grant</Link>
               </Button>
               <Button variant="outlined" color="secondary" 
-                // styles={{background}}
                 onClick={handleSignOut}>
                 Sign Out
               </Button>
@@ -150,6 +150,7 @@ function LocationBasedComponents() {
             <Route path="/create-rules" element={<ProtectedRoute element={<CreateRules />} />} />
 
             <Route path="/approvals" element={<ProtectedRoute element={<Approvals />} />} />
+            <Route path="/create-approvals" element={<ProtectedRoute element={<CreateApprovals />} />} />
 
             <Route path="/categories" element={<ProtectedRoute element={<Categories />} />} />
 
