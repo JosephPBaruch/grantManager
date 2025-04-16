@@ -56,7 +56,7 @@ const CreateUser: React.FC = () => {
     }).then((response) => {
       if (response.ok) {
         toast.success('User created successfully!');
-        navigate("/list-users")
+        navigate("/users")
       } else {
         toast.error('Error creating user: ' + response.statusText);
         console.error('Error creating user:', response.statusText);

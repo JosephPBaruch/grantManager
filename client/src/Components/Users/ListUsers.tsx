@@ -370,7 +370,7 @@ function ListUsers() {
       <Typography variant="h4" component="h1" gutterBottom>
         Users
       </Typography>
-      <Button variant="contained" color="primary" onClick={() => navigate('/users')}>
+      <Button variant="contained" color="primary" onClick={() => navigate('/create-users')}>
         Create User
       </Button>
       {users ? (

@@ -33,10 +33,13 @@ const useStyles = makeStyles({
 
 function CreateBudget() {
   const classes = useStyles();
-  const [budgetName, setBudgetName] = useState('');
+  const [title, setTitle] = useState('');
+  const [fundingAgency, setFundingAgency] = useState('');
+  const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [totalAmount, setTotalAmount] = useState('');
-  const nagivate = useNavigate();
+  const [description, setDescription] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -46,29 +49,31 @@ function CreateBudget() {
       return;
     }
 
-    const budgetData = {
-      name: budgetName,
-      funding_source: "string", // Replace with actual funding source if available
-      start_date: new Date().toISOString(), // Replace with actual start date if available
+    const grantData = {
+      title,
+      funding_agency: fundingAgency,
+      start_date: new Date(startDate).toISOString(),
       end_date: new Date(endDate).toISOString(),
-      amount: parseFloat(totalAmount),
+      total_amount: parseFloat(totalAmount),
+      status: "active", // Default status
+      description,
     };
 
-    fetch('http://localhost:8000/api/v1/budget/', {
+    fetch('http://localhost:8000/api/v1/grants/', {
       method: 'POST',
       headers: {
         'accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
-      body: JSON.stringify(budgetData),
+      body: JSON.stringify(grantData),
     })
     .then(response => response.json())
     .then(data => {
       console.log(data);
-      localStorage.setItem('selected_budget_id', data.id);
-      localStorage.setItem('selected_budget_name', data.name);
-      nagivate("/list-users")
+      localStorage.setItem('selected_grant_id', data.id);
+      localStorage.setItem('selected_grant_title', data.title);
+      navigate("/list-users");
     })
     .catch((error) => {
       console.error('Error:', error);
@@ -77,19 +82,37 @@ function CreateBudget() {
 
   return (
     <Container maxWidth="sm" className={classes.root}>
-        <Typography variant="h4">
-            UIdaho Grant Management
-        </Typography>
+      <Typography variant="h4">
+        UIdaho Grant Management
+      </Typography>
       <Typography variant="h6" gutterBottom>
-        Create Budget
+        Create Grant
       </Typography>
       <Paper className={classes.form} component="form" onSubmit={handleSubmit}>
         <TextField
-          label="Budget Name"
+          label="Title"
           variant="outlined"
           className={classes.formField}
-          value={budgetName}
-          onChange={(e) => setBudgetName(e.target.value)}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <TextField
+          label="Funding Agency"
+          variant="outlined"
+          className={classes.formField}
+          value={fundingAgency}
+          onChange={(e) => setFundingAgency(e.target.value)}
+          required
+        />
+        <TextField
+          label="Start Date"
+          type="date"
+          variant="outlined"
+          className={classes.formField}
+          InputLabelProps={{ shrink: true }}
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
           required
         />
         <TextField
@@ -111,20 +134,29 @@ function CreateBudget() {
           onChange={(e) => setTotalAmount(e.target.value)}
           required
         />
+        <TextField
+          label="Description"
+          variant="outlined"
+          className={classes.formField}
+          multiline
+          rows={4}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
         <Button
           type="submit"
           variant="contained"
           color="primary"
           className={classes.submitButton}
         >
-          Create Budget
+          Create Grant
         </Button>
         <Button
           variant="contained"
           color="secondary"
-          onClick={() => nagivate("/budgets")}
+          onClick={() => navigate("/grants")}
         >
-          Select Budget
+          Back to Grants
         </Button>
       </Paper>
     </Container>

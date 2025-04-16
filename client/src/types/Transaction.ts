@@ -1,7 +1,12 @@
 export interface Transaction {
-  id: number;
-  amount: string;
+  id: string;
+  amount: number;
+  date: string;
   description: string;
+  category: string;
+  invoice_number: string;
+  grant_id: string;
   created_at: string;
-  user: number;
+  updated_at: string;
+  created_by: string;
 }

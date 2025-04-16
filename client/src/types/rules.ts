@@ -1,10 +1,36 @@
 export interface Rule {
-  Name: string;
-  Description: string;
-  Table: string;
-  Enabled: boolean;
-  RuleID: number;
-  Trigger: string;
+  grant_id: string;
+  name: string;
+  description: string;
+  rule_type: string;
+  aggregator: string;
+  error_message: string;
+  is_active: boolean;
+  id: string;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  filters: Filter[];
+  conditions: Condition[];
+}
+
+export interface Filter {
+  field: string;
+  operator: string;
+  value: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Condition {
+  field: string;
+  operator: string;
+  value: string;
+  order: number;
+  id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface RulesResponse {
@@ -21,18 +47,6 @@ export interface Action {
 
 export interface ActionsResponse {
   data: Action[];
-  count: number;
-}
-
-export interface Condition {
-  LeftSID: number;
-  Operator: string;
-  RightSID: number;
-  CID: number;
-}
-
-export interface ConditionsResponse {
-  data: Condition[];
   count: number;
 }
 
