@@ -1,4 +1,4 @@
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Expense, ExpensesResponse } from "../../types/Approval";
@@ -19,6 +19,8 @@ const useStyles = makeStyles({
 function CreateApprovals() {
   const classes = useStyles();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     async function fetchExpenses() {
@@ -53,6 +55,22 @@ function CreateApprovals() {
     fetchExpenses();
   }, []);
 
+  const handleOpenDialog = (expense: Expense) => {
+    setSelectedExpense(expense);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedExpense(null);
+  };
+
+  const handleApprove = () => {
+    console.log("Approved expense:", selectedExpense);
+    // Add logic to handle approval here
+    handleCloseDialog();
+  };
+
   return (
     <Container maxWidth="lg" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -71,6 +89,7 @@ function CreateApprovals() {
               <TableCell>Grant ID</TableCell>
               <TableCell>Created At</TableCell>
               <TableCell>Updated At</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -85,11 +104,37 @@ function CreateApprovals() {
                 <TableCell>{expense.grant_id}</TableCell>
                 <TableCell>{new Date(expense.created_at).toLocaleString()}</TableCell>
                 <TableCell>{new Date(expense.updated_at).toLocaleString()}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={() => handleOpenDialog(expense)}
+                  >
+                    Approve
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Approve Expense</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to approve the expense with ID: {selectedExpense?.id}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleApprove} color="primary">
+            Approve
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
