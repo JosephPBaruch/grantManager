@@ -1,5 +1,5 @@
-import { Container, Button, Dialog, DialogTitle, DialogContent, TextField, Box } from '@mui/material';
-import React, { useState } from 'react';
+import { Container, Button, Dialog, DialogTitle, DialogContent, TextField, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 
 const CreateTemplateRule = () => {
@@ -7,18 +7,44 @@ const CreateTemplateRule = () => {
   const [grantId, setGrantId] = useState(localStorage.getItem("selected_grant_id"));
   const [templateName, setTemplateName] = useState('');
   const [kwargs, setKwargs] = useState('{}');
+  const [templateOptions, setTemplateOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/rules/templates/', {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`, 
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setTemplateOptions(data);
+      } catch (error) {
+        console.error('Error fetching templates:', error);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async () => {
     try {
-      const url = `http://localhost:8000/api/v1/rules/grant/${grantId}/template/${templateName}?kwargs=${encodeURIComponent(kwargs)}`;
+      const url = `http://localhost:8000/api/v1/rules/grant/${grantId}/template/${templateName}?kwargs=${encodeURIComponent(kwargs)}/`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
           'accept': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN_HERE', // Replace with actual token
+          'Authorization': `Bearer ${localStorage.getItem("access_token")}`, 
         },
       });
 
@@ -51,13 +77,20 @@ const CreateTemplateRule = () => {
                 onChange={(e) => setGrantId(e.target.value)}
                 fullWidth
               />
-              <TextField
-                label="Template Name"
-                variant="outlined"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                fullWidth
-              />
+              <FormControl fullWidth>
+                <InputLabel id="template-select-label">Template Name</InputLabel>
+                <Select
+                  labelId="template-select-label"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                >
+                  {templateOptions.map((template) => (
+                    <MenuItem key={template} value={template}>
+                      {template}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 label="Kwargs (JSON)"
                 variant="outlined"
