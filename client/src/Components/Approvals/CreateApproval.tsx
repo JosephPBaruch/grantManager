@@ -1,4 +1,4 @@
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Expense, ExpensesResponse } from "../../types/Approval";
@@ -21,6 +21,7 @@ function CreateApprovals() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [comment, setComment] = useState<string>("");
 
   useEffect(() => {
     async function fetchExpenses() {
@@ -57,18 +58,46 @@ function CreateApprovals() {
 
   const handleOpenDialog = (expense: Expense) => {
     setSelectedExpense(expense);
+    setComment(""); // Reset comment when opening the dialog
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setSelectedExpense(null);
+    setComment("");
   };
 
-  const handleApprove = () => {
-    console.log("Approved expense:", selectedExpense);
-    // Add logic to handle approval here
-    handleCloseDialog();
+  const handleApprove = async () => {
+    if (!selectedExpense) return;
+
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/grant-approvals/', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("access_token")}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          expense_id: selectedExpense.id,
+          status: "approved",
+          comments: comment
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to approve expense');
+      }
+
+      console.log("Expense approved successfully:", selectedExpense.id);
+      // Optionally, refresh the list of expenses or update the UI
+      setExpenses(expenses.filter(expense => expense.id !== selectedExpense.id));
+    } catch (error) {
+      console.error("Error approving expense:", error);
+    } finally {
+      handleCloseDialog();
+    }
   };
 
   return (
@@ -125,6 +154,15 @@ function CreateApprovals() {
           <DialogContentText>
             Are you sure you want to approve the expense with ID: {selectedExpense?.id}?
           </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Comment"
+            type="text"
+            fullWidth
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
