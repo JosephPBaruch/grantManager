@@ -1,3 +1,4 @@
+import uuid
 from logging import getLogger
 from typing import Any, List
 
@@ -49,7 +50,18 @@ async def create_rule(
     session: SessionDep,
     rule_create: RuleCreate,
     current_user: CurrentUser,
+    grant_id: str,
 ) -> Rule:
+    # Verify that the user has access to the grant
+    permission = await has_grant_permission(
+        session=session,
+        grant_id=uuid.UUID(grant_id),
+        permission=GrantPermission.CREATE_RULES,
+        user_id=current_user.id,
+    )
+    if not permission:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
     rule = Rule(
         grant_id=rule_create.grant_id,
         created_by=current_user.id,
@@ -146,7 +158,10 @@ async def create_rule_from_template_endpoint(
     """
     # Verify that the user has access to the grant
     permission = await has_grant_permission(
-        session, str(grant_id), GrantPermission.CREATE_RULES, current_user
+        session=session,
+        grant_id=grant_id,
+        permission=GrantPermission.CREATE_RULES,
+        user_id=current_user.id,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
@@ -169,7 +184,10 @@ async def create_custom_rule(
     Only users with CREATE_RULES permission can create rules.
     """
     permission = await has_grant_permission(
-        session, str(grant_id), GrantPermission.CREATE_RULES, current_user
+        session=session,
+        grant_id=grant_id,
+        permission=GrantPermission.CREATE_RULES,
+        user_id=current_user.id,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")

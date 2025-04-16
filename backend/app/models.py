@@ -195,7 +195,6 @@ class Rule(RuleBase, table=True):
         default_factory=get_utc_now,
         sa_column=Column(TIMESTAMP(timezone=True), nullable=False),
     )
-    created_by: uuid.UUID = Field(foreign_key="user.id")
 
 
 # Public models for API responses
@@ -212,10 +211,9 @@ class RuleConditionPublic(RuleConditionBase):
 
 
 class RulePublic(RuleBase):
+    """Public model for a rule."""
+
     id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
-    created_by: uuid.UUID
     filters: List[RuleFilterPublic] = Field(default_factory=list)
     conditions: List[RuleConditionPublic] = Field(default_factory=list)
 
@@ -259,15 +257,16 @@ class Grant(GrantBase, table=True):
     )
 
 
-class GrantArchive(Grant, table=True):
-    """Grant Archive Table"""
+class GrantUpdate(SQLModel):
+    """Model for partial updates to a grant."""
 
-    __tablename__ = "archived_grant"
-    archived_at: datetime = Field(
-        default_factory=get_utc_now,
-        sa_column=Column(TIMESTAMP(timezone=True), nullable=False),
-    )
-    archived_by: uuid.UUID
+    title: Optional[str] = None
+    funding_agency: Optional[str] = None
+    total_amount: Optional[float] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    status: Optional[str] = None
+    description: Optional[str] = None
 
 
 class GrantCategoryBase(SQLModel):
@@ -294,8 +293,8 @@ class GrantExpenseBase(SQLModel):
     amount: float = Field()
     date: datetime = Field(sa_column=Column(TIMESTAMP(timezone=True), nullable=False))
     description: str = Field()
-    category: str = (
-        Field()
+    category: str = Field(
+        foreign_key="grant_category.code"
     )  # e.g., "SAL" for salary, "TRV" for travel, "EQP" for equipment
     invoice_number: Optional[str] = Field(default=None)
     grant_id: uuid.UUID = Field(foreign_key="grant.id")
@@ -327,10 +326,8 @@ class GrantExpense(GrantExpenseBase, table=True):
 class GrantApprovalBase(SQLModel):
     """Base Grant Approval Model."""
 
-    expense_id: Optional[uuid.UUID] = Field(
-        default=None, foreign_key="grant_expense.id"
-    )
-    status: ApprovalStatus = Field(default="APPROVED")
+    expense_id: Optional[uuid.UUID] = Field(foreign_key="grant_expense.id")
+    status: ApprovalStatus = Field(default="approved")  # approved, rejected
     comments: Optional[str] = Field(default=None)
 
 
@@ -416,6 +413,7 @@ class GrantPermission(str, Enum):
     MANAGE_GRANT = "manage_grant"
     ARCHIVE_GRANT = "archive_grant"
     VIEW_GRANT = "view_grant"
+    EDIT_GRANT = "edit_grant"
 
 
 class GrantRoleBase(SQLModel):

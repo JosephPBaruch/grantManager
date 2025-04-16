@@ -1,11 +1,40 @@
+import re
 from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
 from sqlmodel import Session, select, text
 
-from app.models import Grant, Rule, RuleCondition, RuleFilter, RuleTrigger, RuleType
+from app.models import (
+    Grant,
+    Rule,
+    RuleCondition,
+    RuleFilter,
+    RulePublic,
+    RuleTrigger,
+    RuleType,
+)
 from app.rule_templates import RULE_TEMPLATES
+
+
+def clean(s):
+    # Remove invalid characters
+    s = re.sub("[^0-9a-zA-Z_]", "", s)
+
+    # Remove multiple underscores
+    s = re.sub("_+", "_", s)
+
+    # Remove Dashes
+    s = s.replace("-", "_")
+
+    # Remove leading characters until we find a letter or underscore
+    s = re.sub("^[^a-zA-Z_]+", "", s)
+
+    # Ensure the string is not empty
+    if not s:
+        raise ValueError("Generated string is empty after cleaning.")
+
+    return s
 
 
 class InvalidRule(HTTPException):
@@ -15,14 +44,14 @@ class InvalidRule(HTTPException):
         super().__init__(418, detail, headers)
 
 
-def _generate_trigger_name(rule_id: UUID) -> str:
+def _generate_trigger_name(rule_id: Rule) -> str:
     """Generate a unique trigger name for a rule."""
-    return f"rule_trigger_{rule_id}"
+    return f"rule_trigger_{clean(rule_id.name)}_{clean(str(rule_id.id)[:8])}"
 
 
-def _generate_function_name(rule_id: UUID) -> str:
+def _generate_function_name(rule_id: Rule) -> str:
     """Generate a unique function name for a rule."""
-    return f"rule_function_{rule_id}"
+    return f"rule_function_{clean(rule_id.name)}_{clean(str(rule_id.id)[:8])}"
 
 
 def _generate_trigger_function(
@@ -33,7 +62,7 @@ def _generate_trigger_function(
     Returns the SQL function definition.
     """
     # Start building the function
-    function_name = _generate_function_name(rule.id)
+    function_name = _generate_function_name(rule)
     sql = f"""
     CREATE OR REPLACE FUNCTION {function_name}()
     RETURNS TRIGGER AS $$
@@ -147,8 +176,8 @@ def _create_trigger(
     Create a PostgreSQL trigger for a rule.
     """
     # Generate function and trigger names
-    function_name = _generate_function_name(rule.id)
-    trigger_name = _generate_trigger_name(rule.id)
+    function_name = _generate_function_name(rule)
+    trigger_name = _generate_trigger_name(rule)
 
     # Generate the trigger function
     function_sql = _generate_trigger_function(rule, filters, conditions)
@@ -225,7 +254,7 @@ async def validate_rule(
 
 async def create_rule_from_template(
     session: Session, template_name: str, grant_id: UUID, user_id: UUID, **kwargs
-) -> Rule:
+) -> RulePublic:
     """
     Create a new rule from a template and set up its PostgreSQL trigger.
     """
@@ -237,7 +266,6 @@ async def create_rule_from_template(
     # Create the rule
     rule = Rule(
         grant_id=grant_id,
-        created_by=user_id,
         name=kwargs.get("name", template["name"]),
         description=kwargs.get("description", template["description"]),
         rule_type=template["rule_type"],
@@ -278,8 +306,13 @@ async def create_rule_from_template(
 
     # Create the PostgreSQL trigger
     _create_trigger(session, rule, filters, conditions)
+    session.refresh(rule)
 
-    return rule
+    return RulePublic(
+        conditions=conditions,
+        filters=filters,
+        **rule.model_dump(),
+    )
 
 
 async def update_rule(session: Session, rule_id: UUID, is_active: bool) -> Rule:

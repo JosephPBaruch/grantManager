@@ -1,4 +1,4 @@
-from app.models import RuleType, RuleOperator, RuleAggregator
+from app.models import RuleAggregator, RuleOperator, RuleType
 
 RULE_TEMPLATES = {
     "max_expense_amount": {
@@ -11,12 +11,12 @@ RULE_TEMPLATES = {
                 "order": 1,
                 "field": "amount",
                 "operator": RuleOperator.LESS_THAN_EQUALS,
-                "value": "1000"
+                "value": "1000",
             }
         ],
-        "error_message": "Expense amount exceeds the maximum allowed amount"
+        "error_message": "Expense amount exceeds the maximum allowed amount",
     },
-    "expense_date_range": {
+    "max_grant_funding": {
         "name": "Expense Date Range",
         "description": "Ensures expenses are within the grant period",
         "rule_type": RuleType.BUDGET,
@@ -25,23 +25,50 @@ RULE_TEMPLATES = {
             {
                 "field": "date",
                 "operator": RuleOperator.GREATER_THAN_EQUALS,
-                "value": "grant.start_date"
+                "value": "grant.start_date",
             },
             {
                 "field": "date",
                 "operator": RuleOperator.LESS_THAN_EQUALS,
-                "value": "grant.end_date"
-            }
+                "value": "grant.end_date",
+            },
         ],
         "conditions": [
             {
                 "order": 1,
                 "field": "amount",
                 "operator": RuleOperator.LESS_THAN,
-                "value": "100000"
+                "value": "grant.total_amount",
             }
         ],
-        "error_message": "Total expenses exceed the grant period limit"
+        "error_message": "Total expenses exceed the grant period limit",
+    },
+    "expense_date_range": {
+        "name": "Expense Date Range",
+        "description": "Expense outside of grant period.",
+        "rule_type": RuleType.BUDGET,
+        "aggregator": RuleAggregator.SUM,
+        "filters": [
+            {
+                "field": "date",
+                "operator": RuleOperator.LESS_THAN,
+                "value": "grant.start_date",
+            },
+            {
+                "field": "date",
+                "operator": RuleOperator.GREATER_THAN,
+                "value": "grant.end_date",
+            },
+        ],
+        "conditions": [
+            {
+                "order": 1,
+                "field": "amount",
+                "operator": RuleOperator.LESS_THAN,
+                "value": "0",
+            }
+        ],
+        "error_message": "Expense outside of grant period.",
     },
     "category_restriction": {
         "name": "Category Restriction",
@@ -53,9 +80,9 @@ RULE_TEMPLATES = {
                 "order": 1,
                 "field": "category",
                 "operator": RuleOperator.IN,
-                "value": "['SAL', 'TRV', 'EQP']"
+                "value": "['SAL', 'TRV', 'EQP']",
             }
         ],
-        "error_message": "Expense category is not allowed"
-    }
-} 
+        "error_message": "Expense category is not allowed",
+    },
+}

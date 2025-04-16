@@ -69,6 +69,20 @@ class Settings(BaseSettings):
             path=self.POSTGRES_DB,
         )
 
+    POSTGRES_TESTING_DB: str = "testing"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def TESTING_DATABASE_URI(self) -> PostgresDsn:
+        return MultiHostUrl.build(
+            scheme="postgresql+psycopg",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_TESTING_DB,
+        )
+
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
     SMTP_PORT: int = 587

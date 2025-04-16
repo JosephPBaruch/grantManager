@@ -11,6 +11,7 @@ from app.models import (
     GrantRolePublic,
     GrantRolesPublic,
     GrantRoleType,
+    User,
 )
 from app.permissions import create_default_grant_role, has_grant_permission
 
@@ -40,7 +41,7 @@ async def read_grant_roles(
 async def create_grant_role(
     session: SessionDep,
     grant_id: str,
-    user_id: str,
+    email: str,
     role_type: GrantRoleType,
     current_user: CurrentUser,
 ) -> Any:
@@ -57,6 +58,12 @@ async def create_grant_role(
             status_code=403,
             detail=f"User does not have permission: {GrantPermission.MANAGE_ROLES}",
         )
+
+    # Verify that the user exists
+    user_id = session.exec(select(User.id).where(User.email == email)).first()
+
+    if not user_id:
+        raise HTTPException(status_code=404, detail="User not found")
 
     # Check if role already exists
     statement = select(GrantRole).where(
