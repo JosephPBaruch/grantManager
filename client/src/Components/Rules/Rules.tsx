@@ -17,6 +17,7 @@ import {
   IconButton
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import CreateTemplateRule from './CreateTemplateRule';
 
 const Rules = () => {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -82,6 +83,9 @@ const Rules = () => {
       <Button variant="contained" color="primary" onClick={() => navigate('/create-rules')}>
         Create Rule
       </Button>
+      <br />
+      <br />
+      <CreateTemplateRule />
       {rules.length === 0 ? (
         <Typography variant="body1">No rules available.</Typography>
       ) : (
