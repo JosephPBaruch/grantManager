@@ -11,3 +11,10 @@ readme = "README.md"
 requires-python = ">=3.9"
 authors = [{ name = "Nathan Hampton", email = "hamp0837@vandals.uidaho.edu" }]
 dependencies = ["fastapi[standard]", "sqlmodel", "pydantic-settings", "tenacity", "pyjwt", "passlib", "emails", "psycopg[binary,pool]", "bcrypt", "alembic",'psycopg2']
+
+[tool.uv]
+dev-dependencies = [
+    "psycopg2>=2.9.10",
+    "pytest>=8.3.5",
+]
+
