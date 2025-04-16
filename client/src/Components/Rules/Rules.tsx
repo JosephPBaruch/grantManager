@@ -27,44 +27,37 @@ const Rules = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const tempData: Rule[] = [
-      {
-        grant_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        name: "Sample Rule",
-        description: "This is a sample rule for demonstration purposes.",
-        rule_type: "expense",
-        aggregator: "SUM",
-        error_message: "Sample error message",
-        is_active: true,
-        id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        created_at: "2025-04-15T15:59:43.882Z",
-        updated_at: "2025-04-15T15:59:43.882Z",
-        created_by: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        filters: [
-          {
-            field: "amount",
-            operator: ">",
-            value: "1000",
-            id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            created_at: "2025-04-15T15:59:43.882Z",
-            updated_at: "2025-04-15T15:59:43.882Z",
-          },
-        ],
-        conditions: [
-          {
-            field: "category",
-            operator: "=",
-            value: "travel",
-            order: 1,
-            id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            created_at: "2025-04-15T15:59:43.882Z",
-            updated_at: "2025-04-15T15:59:43.882Z",
-          },
-        ],
-      },
-    ];
-    setRules(tempData);
-    setLoading(false);
+    const fetchRules = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/rules/?skip=0&limit=100', {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch rules');
+        }
+
+        const result = await response.json();
+        console.log(result);
+        if (result && Array.isArray(result.data)) {
+          setRules(result.data); // Access the `data` property of the response
+        } else {
+          console.error('Unexpected response format:', result);
+          setRules([]);
+        }
+      } catch (error) {
+        console.error('Error fetching rules:', error);
+        setRules([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRules();
   }, []);
 
   const toggleDrawer = () => {
