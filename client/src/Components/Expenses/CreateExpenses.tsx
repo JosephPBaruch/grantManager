@@ -1,6 +1,9 @@
 import { Button, Container, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useState } from "react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const useStyles = makeStyles({
   form: {
@@ -49,15 +52,18 @@ function CreateExpenses() {
         invoice_number: invoiceNumber,
         grant_id: grantId,
       }),
-    }).then((response) => {
-      if (response.ok) {
-        console.log('Expense created!');
-      } else {
-        console.error('Failed to create expense');
-      }
-    }).catch((error) => {
-      console.error('Error creating expense:', error);
-    });
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          toast.success('Expense created!');
+        } else {
+          const errorData = await response.json();
+          toast.error(errorData.detail || 'Failed to create expense');
+        }
+      })
+      .catch((error) => {
+        console.error('Error creating expense:', error);
+      });
   };
 
   return (
@@ -117,6 +123,7 @@ function CreateExpenses() {
           Create Expense
         </Button>
       </form>
+    <ToastContainer />
     </Container>
   );
 }
