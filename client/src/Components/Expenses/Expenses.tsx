@@ -1,4 +1,4 @@
-import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Dialog, DialogContent, DialogTitle, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { Transaction } from "../../types/Transaction";
@@ -30,6 +30,14 @@ function Expenses() {
   const [editDialogOpen, setEditDialogOpen] = useState(false); // State for edit dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // State for delete dialog
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null); // Selected transaction
+  const [editForm, setEditForm] = useState({
+    amount: 0,
+    date: "",
+    description: "",
+    category: "",
+    invoice_number: "",
+    grant_id: "",
+  });
   const backendHost = useBackendHost();
 
   useEffect(() => {
@@ -66,12 +74,65 @@ function Expenses() {
 
   const handleEditClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
+    setEditForm({
+      amount: transaction.amount || 0,
+      date: new Date(transaction.date).toISOString().slice(0, 16), // Format for datetime-local
+      description: transaction.description || "",
+      category: transaction.category || "",
+      invoice_number: transaction.invoice_number || "",
+      grant_id: transaction.grant_id || "",
+    });
     setEditDialogOpen(true);
   };
 
   const handleDeleteClick = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setDeleteDialogOpen(true);
+  };
+
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: name === "amount" ? parseFloat(value) : value,
+    }));
+  };
+
+  const handleEditSave = () => {
+    if (!selectedTransaction) return;
+
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      console.error('No access token found');
+      return;
+    }
+
+    fetch(`http://${backendHost}:8000/api/v1/grant-expenses/${selectedTransaction.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        ...editForm,
+        date: new Date(editForm.date).toISOString(),
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((updatedTransaction) => {
+        setTransactions((prev) =>
+          prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t))
+        );
+        handleEditDialogClose();
+      })
+      .catch((error) => {
+        console.error('Error updating transaction:', error.message);
+      });
   };
 
   const handleEditDialogClose = () => {
@@ -166,9 +227,66 @@ function Expenses() {
       <Dialog open={editDialogOpen} onClose={handleEditDialogClose} fullWidth maxWidth="sm">
         <DialogTitle>Edit Expense</DialogTitle>
         <DialogContent>
-          {/* {selectedTransaction && (
-            // <MakeTransactions transaction={selectedTransaction} onClose={handleEditDialogClose} />
-          )} */}
+          <form>
+            <TextField
+              label="Amount"
+              name="amount"
+              type="number"
+              value={editForm.amount}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Date"
+              name="date"
+              type="datetime-local"
+              value={editForm.date}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Description"
+              name="description"
+              value={editForm.description}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Category"
+              name="category"
+              value={editForm.category}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Invoice Number"
+              name="invoice_number"
+              value={editForm.invoice_number}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Grant ID"
+              name="grant_id"
+              value={editForm.grant_id}
+              onChange={handleEditFormChange}
+              fullWidth
+              margin="normal"
+            />
+            <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+              <Button onClick={handleEditDialogClose} style={{ marginRight: '10px' }}>
+                Cancel
+              </Button>
+              <Button variant="contained" color="primary" onClick={handleEditSave}>
+                Save
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 
