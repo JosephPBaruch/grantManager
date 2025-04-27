@@ -14,7 +14,12 @@ import {
   TableHead, 
   TableRow, 
   Paper,
-  IconButton
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import CreateTemplateRule from './CreateTemplateRule';
@@ -25,6 +30,8 @@ const Rules = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
   const [drawerCollapsed, setDrawerCollapsed] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState<Rule | null>(null);
   const navigate = useNavigate();
   const backendHost = useBackendHost();
 
@@ -66,6 +73,40 @@ const Rules = () => {
     setDrawerCollapsed(!drawerCollapsed);
   };
 
+  const handleDeleteClick = (rule: Rule) => {
+    setRuleToDelete(rule);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!ruleToDelete) return;
+
+    try {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/rules/${ruleToDelete.id}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete rule');
+      }
+
+      setRules(rules.filter(rule => rule.id !== ruleToDelete.id));
+      setDeleteDialogOpen(false);
+      setRuleToDelete(null);
+    } catch (error) {
+      console.error('Error deleting rule:', error);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setRuleToDelete(null);
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -93,6 +134,7 @@ const Rules = () => {
                   <TableCell>Description</TableCell>
                   <TableCell>Type</TableCell>
                   <TableCell>Active</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -107,6 +149,18 @@ const Rules = () => {
                     <TableCell>{rule.description}</TableCell>
                     <TableCell>{rule.rule_type}</TableCell>
                     <TableCell>{rule.is_active ? 'Yes' : 'No'}</TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="outlined" 
+                        color="secondary" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(rule);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -223,6 +277,25 @@ const Rules = () => {
           </Drawer>
         </div>
       )}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+      >
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the rule "{ruleToDelete?.name}"? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="secondary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
