@@ -25,6 +25,13 @@ function Categories() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const backendHost = useBackendHost();
+  const accessToken = localStorage.getItem('access_token');
+
+
+  if (!accessToken) {
+    console.error('No access token found');
+    // return;
+  }
 
   useEffect(() => {
     async function fetchCategories() {
@@ -32,6 +39,7 @@ function Categories() {
         const response = await fetch(`http://${backendHost}:8000/api/v1/grant-categories/?skip=0&limit=100`, {
           headers: {
             'accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
           }
         });
         const data = await response.json();
@@ -69,6 +77,10 @@ function Categories() {
       try {
         await fetch(`http://${backendHost}:8000/api/v1/grant-categories/${selectedCategory.id}`, {
           method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          }
+          
         });
         setCategories(categories.filter((cat) => cat.id !== selectedCategory.id));
       } catch (error) {
