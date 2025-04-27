@@ -253,8 +253,13 @@ function ListUsers() {
     });
   }, []);
 
+  useEffect(() => {
+    // Log user IDs to the console
+    console.log("User IDs:", users.map(user => user.id));
+  }, [users]);
+
   return (
-    <Container maxWidth="md" className={classes.root}>
+    <Container maxWidth="lg" className={classes.root}>
       <ToastContainer />
       <Typography variant="h4" component="h1" gutterBottom>
         Current User
@@ -272,6 +277,7 @@ function ListUsers() {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell> {/* Add ID column */}
                 <TableCell>Full Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Created At</TableCell>
@@ -283,6 +289,7 @@ function ListUsers() {
             </TableHead>
             <TableBody>
               <TableRow>
+                <TableCell>{currentUser.id}</TableCell> {/* Display current user ID */}
                 <TableCell>{currentUser.full_name}</TableCell>
                 <TableCell>{currentUser.email}</TableCell>
                 <TableCell>{new Date(currentUser.created_at).toLocaleString()}</TableCell>
@@ -380,6 +387,7 @@ function ListUsers() {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell> {/* Add ID column */}
                 <TableCell>Full Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Created At</TableCell>
@@ -392,6 +400,7 @@ function ListUsers() {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
+                  <TableCell>{user.id}</TableCell> {/* Display user ID */}
                   <TableCell>{user.full_name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
