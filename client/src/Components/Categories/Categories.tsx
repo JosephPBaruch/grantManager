@@ -1,4 +1,4 @@
-import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from "@mui/material";
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Category } from "../../types/Categories";
@@ -90,6 +90,30 @@ function Categories() {
     handleCloseDeleteDialog();
   };
 
+  const handleSaveEdit = async () => {
+    if (selectedCategory) {
+      try {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/grant-categories/${selectedCategory.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(selectedCategory),
+        });
+        if (response.ok) {
+          const updatedCategory = await response.json();
+          setCategories(categories.map((cat) => (cat.id === updatedCategory.id ? updatedCategory : cat)));
+        } else {
+          console.error("Error updating category:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error updating category:", error);
+      }
+    }
+    handleCloseEditDialog();
+  };
+
   return (
     <Container maxWidth="lg" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
@@ -132,16 +156,45 @@ function Categories() {
       <Dialog open={openEditDialog} onClose={handleCloseEditDialog}>
         <DialogTitle>Edit Category</DialogTitle>
         <DialogContent>
-          {/* Add form fields for editing the category */}
-          <DialogContentText>
-            Editing functionality is not implemented yet.
-          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Name"
+            type="text"
+            fullWidth
+            value={selectedCategory?.name || ""}
+            onChange={(e) => setSelectedCategory({ ...selectedCategory!, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            type="text"
+            fullWidth
+            value={selectedCategory?.description || ""}
+            onChange={(e) => setSelectedCategory({ ...selectedCategory!, description: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Code"
+            type="text"
+            fullWidth
+            value={selectedCategory?.code || ""}
+            onChange={(e) => setSelectedCategory({ ...selectedCategory!, code: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Active"
+            type="text"
+            fullWidth
+            value={selectedCategory?.is_active ? "Yes" : "No"}
+            onChange={(e) => setSelectedCategory({ ...selectedCategory!, is_active: e.target.value === "Yes" })}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleCloseEditDialog} color="primary">
+          <Button onClick={handleSaveEdit} color="primary">
             Save
           </Button>
         </DialogActions>
