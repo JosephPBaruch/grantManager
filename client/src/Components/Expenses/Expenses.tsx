@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { Transaction } from "../../types/Transaction";
 import MakeTransactions from "./CreateExpenses"; // Import the MakeTransactions component
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -26,6 +27,7 @@ function Expenses() {
   const classes = useStyles();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [openDialog, setOpenDialog] = useState(false); 
+  const backendHost = useBackendHost();
 
   useEffect(() => {
 
@@ -35,7 +37,7 @@ function Expenses() {
       return;
     }
 
-    fetch(`http://127.0.0.1:8000/api/v1/grant-expenses/?grant_id=${localStorage.getItem('selected_grant_title')}&skip=0&limit=100`, {
+    fetch(`http://${backendHost}:8000/api/v1/grant-expenses/?grant_id=${localStorage.getItem('selected_grant_title')}&skip=0&limit=100`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
