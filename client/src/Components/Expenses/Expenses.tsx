@@ -174,7 +174,7 @@ function Expenses() {
   };
 
   return (
-    <Container maxWidth="md" className={classes.root}>
+    <Container maxWidth="lg" className={classes.root}>
       <Typography variant="h4" component="h1" gutterBottom>
         Expenses
       </Typography>
