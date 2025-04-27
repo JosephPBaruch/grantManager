@@ -5,8 +5,33 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useBackendHost } from '../../host';
 
+type Filter = {
+  field: string;
+  operator: string;
+  value: string;
+};
+
+type Condition = {
+  field: string;
+  operator: string;
+  value: string;
+  order: number;
+};
+
+type FormData = {
+  grant_id: string;
+  name: string;
+  description: string;
+  rule_type: string;
+  aggregator: string;
+  error_message: string;
+  is_active: boolean;
+  filters: Filter[];
+  conditions: Condition[];
+};
+
 const CreateRules = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     grant_id: localStorage.getItem('selected_grant_id') || '',
     name: '',
     description: '',
@@ -14,14 +39,42 @@ const CreateRules = () => {
     aggregator: '',
     error_message: '',
     is_active: true,
-    filters: [{ field: '', operator: '', value: '' }],
-    conditions: [{ field: '', operator: '', value: '', order: 0 }],
+    filters: [{ field: '', operator: '=', value: '' }],
+    conditions: [{ field: '', operator: '=', value: '', order: 0 }],
   });
   const backendHost = useBackendHost();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleArrayChange = <T extends keyof FormData>(
+    index: number,
+    arrayName: T,
+    field: keyof FormData[T][number],
+    value: string | number
+  ) => {
+    setFormData({
+      ...formData,
+      [arrayName]: formData[arrayName].map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ) as FormData[T],
+    });
+  };
+
+  const addArrayItem = <T extends keyof FormData>(arrayName: T, newItem: FormData[T][number]) => {
+    setFormData({
+      ...formData,
+      [arrayName]: [...formData[arrayName], newItem] as FormData[T],
+    });
+  };
+
+  const removeArrayItem = <T extends keyof FormData>(arrayName: T, index: number) => {
+    setFormData({
+      ...formData,
+      [arrayName]: formData[arrayName].filter((_, i) => i !== index) as FormData[T],
+    });
   };
 
   const handleSubmit = async () => {
@@ -111,115 +164,97 @@ const CreateRules = () => {
           placeholder="Enter the error message to display"
           fullWidth
         />
-        <TextField
-          label="Filter Field"
-          name="filters[0].field"
-          value={formData.filters[0].field}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              filters: [{ ...formData.filters[0], field: e.target.value }],
-            })
-          }
-          placeholder="Enter the filter field (e.g., amount)"
-          fullWidth
-        />
-        <Box>
-          <Typography>Filter Operator</Typography>
-          <Select
-            name="filters[0].operator"
-            value={formData.filters[0].operator}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                filters: [{ ...formData.filters[0], operator: e.target.value }],
-              })
-            }
-            fullWidth
-          >
-            <MenuItem value="=">=</MenuItem>
-            <MenuItem value="!=">!=</MenuItem>
-            <MenuItem value=">">&gt;</MenuItem>
-            <MenuItem value="<">&lt;</MenuItem>
-            <MenuItem value=">=">&gt;=</MenuItem>
-            <MenuItem value="<=">&lt;=</MenuItem>
-          </Select>
-        </Box>
-        <TextField
-          label="Filter Value"
-          name="filters[0].value"
-          value={formData.filters[0].value}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              filters: [{ ...formData.filters[0], value: e.target.value }],
-            })
-          }
-          placeholder="Enter the filter value (e.g., 1000)"
-          fullWidth
-        />
-        <TextField
-          label="Condition Field"
-          name="conditions[0].field"
-          value={formData.conditions[0].field}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              conditions: [{ ...formData.conditions[0], field: e.target.value }],
-            })
-          }
-          placeholder="Enter the condition field (e.g., category)"
-          fullWidth
-        />
-        <Box>
-          <Typography>Condition Operator</Typography>
-          <Select
-            name="conditions[0].operator"
-            value={formData.conditions[0].operator}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                conditions: [{ ...formData.conditions[0], operator: e.target.value }],
-              })
-            }
-            fullWidth
-          >
-            <MenuItem value="=">=</MenuItem>
-            <MenuItem value="!=">!=</MenuItem>
-            <MenuItem value=">">&gt;</MenuItem>
-            <MenuItem value="<">&lt;</MenuItem>
-            <MenuItem value=">=">&gt;=</MenuItem>
-            <MenuItem value="<=">&lt;=</MenuItem>
-          </Select>
-        </Box>
-        <TextField
-          label="Condition Value"
-          name="conditions[0].value"
-          value={formData.conditions[0].value}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              conditions: [{ ...formData.conditions[0], value: e.target.value }],
-            })
-          }
-          placeholder="Enter the condition value (e.g., travel)"
-          fullWidth
-        />
-        <TextField
-          label="Condition Order"
-          name="conditions[0].order"
-          type="number"
-          value={formData.conditions[0].order}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              conditions: [{ ...formData.conditions[0], order: parseInt(e.target.value, 10) }],
-            })
-          }
-          placeholder="Enter the condition order (e.g., 0, 1, 2)"
-          fullWidth
-        />
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Typography variant="h6">Filters</Typography>
+        {formData.filters.map((filter, index) => (
+          <Box key={index} display="flex" flexDirection="column" gap={1}>
+            <TextField
+              label="Filter Field"
+              value={filter.field}
+              onChange={(e) => handleArrayChange(index, 'filters', 'field', e.target.value)}
+              placeholder="Enter the filter field (e.g., amount)"
+              fullWidth
+            />
+            <Select
+              value={filter.operator}
+              onChange={(e) => handleArrayChange(index, 'filters', 'operator', e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="=">=</MenuItem>
+              <MenuItem value="!=">!=</MenuItem>
+              <MenuItem value=">">&gt;</MenuItem>
+              <MenuItem value="<">&lt;</MenuItem>
+              <MenuItem value=">=">&gt;=</MenuItem>
+              <MenuItem value="<=">&lt;=</MenuItem>
+            </Select>
+            <TextField
+              label="Filter Value"
+              value={filter.value}
+              onChange={(e) => handleArrayChange(index, 'filters', 'value', e.target.value)}
+              placeholder="Enter the filter value (e.g., 1000)"
+              fullWidth
+            />
+            <Button variant="outlined" color="secondary" onClick={() => removeArrayItem('filters', index)}>
+              Remove Filter
+            </Button>
+          </Box>
+        ))}
+        <Button
+          variant="contained"
+          onClick={() => addArrayItem('filters', { field: '', operator: '=', value: '' })}
+        >
+          Add Filter
+        </Button>
+
+        <Typography variant="h6">Conditions</Typography>
+        {formData.conditions.map((condition, index) => (
+          <Box key={index} display="flex" flexDirection="column" gap={1}>
+            <TextField
+              label="Condition Field"
+              value={condition.field}
+              onChange={(e) => handleArrayChange(index, 'conditions', 'field', e.target.value)}
+              placeholder="Enter the condition field (e.g., category)"
+              fullWidth
+            />
+            <Select
+              value={condition.operator}
+              onChange={(e) => handleArrayChange(index, 'conditions', 'operator', e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="=">=</MenuItem>
+              <MenuItem value="!=">!=</MenuItem>
+              <MenuItem value=">">&gt;</MenuItem>
+              <MenuItem value="<">&lt;</MenuItem>
+              <MenuItem value=">=">&gt;=</MenuItem>
+              <MenuItem value="<=">&lt;=</MenuItem>
+            </Select>
+            <TextField
+              label="Condition Value"
+              value={condition.value}
+              onChange={(e) => handleArrayChange(index, 'conditions', 'value', e.target.value)}
+              placeholder="Enter the condition value (e.g., travel)"
+              fullWidth
+            />
+            <TextField
+              label="Condition Order"
+              type="number"
+              value={condition.order}
+              onChange={(e) => handleArrayChange(index, 'conditions', 'order', parseInt(e.target.value, 10))}
+              placeholder="Enter the condition order (e.g., 0, 1, 2)"
+              fullWidth
+            />
+            <Button variant="outlined" color="secondary" onClick={() => removeArrayItem('conditions', index)}>
+              Remove Condition
+            </Button>
+          </Box>
+        ))}
+        <Button
+          variant="contained"
+          onClick={() => addArrayItem('conditions', { field: '', operator: '=', value: '', order: 0 })}
+        >
+          Add Condition
+        </Button>
+
+        <Button variant="contained" color="secondary" onClick={handleSubmit}>
           Submit
         </Button>
       </Box>
