@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
 import { Budget } from "../../types/Grant";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -32,10 +33,11 @@ function Budgets() {
   const classes = useStyles();
   const navigate = useNavigate();
   const [budgets, setBudgets] = useState<Budget[]>([]);
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    fetch('http://localhost:8000/api/v1/grants/?skip=0&limit=100', {
+    fetch(`http://${backendHost}:8000/api/v1/grants/?skip=0&limit=100`, {
       method: 'GET',
       headers: {
         'accept': 'application/json',

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import EditUser from "./EditUser"; // Import the EditUser component
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -43,6 +44,7 @@ function ListUsers() {
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const backendHost = useBackendHost();
 
   const handleEditClick = (userId: string) => {
     setSelectedUserId(userId);
@@ -82,7 +84,7 @@ function ListUsers() {
       return;
     }
 
-    fetch(`http://localhost:8000/api/v1/users/${userToDelete}`, {
+    fetch(`http://${backendHost}:8000/api/v1/users/${userToDelete}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -122,7 +124,7 @@ function ListUsers() {
       return;
     }
 
-    fetch('http://localhost:8000/api/v1/users/me', {
+    fetch(`http://${backendHost}:8000/api/v1/users/me`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -178,7 +180,7 @@ function ListUsers() {
       return;
     }
 
-    fetch('http://localhost:8000/api/v1/users/me/password', {
+    fetch(`http://${backendHost}:8000/api/v1/users/me/password`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +216,7 @@ function ListUsers() {
     }
 
     // Fetch current user data
-    fetch('http://localhost:8000/api/v1/users/me', {
+    fetch(`http://${backendHost}:8000/api/v1/users/me`, {
       method: 'GET',
       headers: {
         'accept': 'application/json',
@@ -232,7 +234,7 @@ function ListUsers() {
     });
 
     // Fetch all users
-    fetch('http://localhost:8000/api/v1/users/?skip=0&limit=100', {
+    fetch(`http://${backendHost}:8000/api/v1/users/?skip=0&limit=100`, {
       method: 'GET',
       headers: {
         'accept': 'application/json',

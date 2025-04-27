@@ -3,6 +3,7 @@ import { Button, Container, TextField, Typography, Box, Select, MenuItem } from 
 import { toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { useBackendHost } from '../../host';
 
 const CreateRules = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ const CreateRules = () => {
     filters: [{ field: '', operator: '', value: '' }],
     conditions: [{ field: '', operator: '', value: '', order: 0 }],
   });
+  const backendHost = useBackendHost();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -25,7 +27,7 @@ const CreateRules = () => {
   const handleSubmit = async () => {
     const token = localStorage.getItem('token');
     try {
-      const response = await fetch('http://localhost:8000/api/v1/rules/', {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/rules/`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',

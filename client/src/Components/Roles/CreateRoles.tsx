@@ -8,6 +8,7 @@ import {
   Button,
   MenuItem,
 } from '@mui/material';
+import { useBackendHost } from '../../host';
 
 type User = {
   id: string;
@@ -20,11 +21,12 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const [roleType, setRoleType] = useState('');
   const [permissions, setPermissions] = useState<string[]>([]);
   const [users, setUsers] = useState<User | null>(null);
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/users/?skip=0&limit=100', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/users/?skip=0&limit=100`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
@@ -56,7 +58,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/grant-roles/grant/${grantId}/user/${userId}?role_type=${roleType}`,
+        `http://${backendHost}:8000/api/v1/grant-roles/grant/${grantId}/user/${userId}?role_type=${roleType}`,
         {
           method: 'POST',
           headers: {

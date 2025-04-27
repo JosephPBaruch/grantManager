@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Role } from "../../types/Roles";
 import CreateRoles from "./CreateRoles";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -22,10 +23,11 @@ function Roles() {
   const classes = useStyles();
   const [roles, setRoles] = useState<Role[]>([]); 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const backendHost = useBackendHost();
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
         method: 'GET',
         headers: {
             'accept': 'application/json',

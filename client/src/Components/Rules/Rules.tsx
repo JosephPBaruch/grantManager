@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import CreateTemplateRule from './CreateTemplateRule';
+import { useBackendHost } from '../../host';
 
 const Rules = () => {
   const [rules, setRules] = useState<Rule[]>([]);
@@ -25,11 +26,12 @@ const Rules = () => {
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
   const [drawerCollapsed, setDrawerCollapsed] = useState(false);
   const navigate = useNavigate();
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     const fetchRules = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/?skip=0&limit=100', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/rules/?skip=0&limit=100`, {
           method: 'GET',
           headers: {
             'accept': 'application/json',

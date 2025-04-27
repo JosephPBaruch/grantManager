@@ -2,6 +2,7 @@ import { Container, Typography, Table, TableBody, TableCell, TableContainer, Tab
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Expense, ExpensesResponse } from "../../types/Approval";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -22,11 +23,13 @@ function CreateApprovals() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [comment, setComment] = useState<string>("");
+  const backendHost = useBackendHost();
+  
 
   useEffect(() => {
     async function fetchExpenses() {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/grant-approvals/pending-expenses?skip=0&limit=100', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/grant-approvals/pending-expenses?skip=0&limit=100`, {
           method: 'POST',
           headers: {
             'accept': 'application/json',
@@ -72,7 +75,7 @@ function CreateApprovals() {
     if (!selectedExpense) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/grant-approvals/', {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-approvals/`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',

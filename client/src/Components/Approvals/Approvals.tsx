@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Approval, ApprovalsResponse } from "../../types/Approval";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -21,11 +22,12 @@ function Approvals() {
   const classes = useStyles();
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const navigate = useNavigate();
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     async function fetchApprovals() {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/grant-approvals/?skip=0&limit=100', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/grant-approvals/?skip=0&limit=100`, {
           headers: {
             'accept': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem("access_token")}`

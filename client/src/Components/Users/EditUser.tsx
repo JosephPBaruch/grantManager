@@ -10,6 +10,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import { User } from "../../types/User";
+import { useBackendHost } from "../../host";
 
 interface EditUserProps {
   userId: string;
@@ -23,12 +24,13 @@ interface EditUserProps {
 const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave, isCurrentUser }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     if (open) {
       // Fetch user data when dialog opens
       setLoading(true);
-      fetch(`http://localhost:8000/api/v1/users/${userId}`, 
+      fetch(`http://${backendHost}:8000/api/v1/users/${userId}`, 
         {
         method: 'GET',
         headers: {
@@ -55,7 +57,7 @@ const EditUser: React.FC<EditUserProps> = ({ userId, open, onClose, onSave, isCu
 
   const handleSave = () => {
     if (user) {
-      const endpoint = isCurrentUser ? 'http://localhost:8000/api/v1/users/me' : `http://localhost:8000/api/v1/users/${userId}`;
+      const endpoint = isCurrentUser ? `http://${backendHost}:8000/api/v1/users/me` : `http://${backendHost}:8000/api/v1/users/${userId}`;
       fetch(endpoint, {
         method: "PATCH",
         headers: {

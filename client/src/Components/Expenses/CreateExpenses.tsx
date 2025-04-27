@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useState } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useBackendHost } from "../../host";
 
 
 const useStyles = makeStyles({
@@ -29,6 +30,7 @@ function CreateExpenses() {
   const [category, setCategory] = useState('');
   const [invoiceNumber, setInvoiceNumber] = useState('');
   const [grantId, setGrantId] = useState(localStorage.getItem('selected_grant_id') || '');
+  const backendHost = useBackendHost();
 
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -38,7 +40,7 @@ function CreateExpenses() {
       return;
     }
 
-    fetch('http://localhost:8000/api/v1/grant-expenses/', {
+    fetch(`http://${backendHost}:8000/api/v1/grant-expenses/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
