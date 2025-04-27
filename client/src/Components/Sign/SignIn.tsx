@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -33,10 +34,11 @@ function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const backendHost = useBackendHost();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    fetch('http://localhost:8000/api/v1/login/access-token', {
+    fetch(`http://${backendHost}:8000/api/v1/login/access-token`, {
       method: 'POST',
       headers: new Headers({
         'accept': 'application/json',

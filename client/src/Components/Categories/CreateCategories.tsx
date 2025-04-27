@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Checkbox, FormControlLabel } from '@mui/material';
+import { useBackendHost } from '../../host';
 
 const CreateCategories: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const CreateCategories: React.FC = () => {
     is_active: true,
   });
   const [open, setOpen] = useState(false);
+  const backendHost = useBackendHost();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -22,7 +24,7 @@ const CreateCategories: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8000/api/v1/grant-categories/', {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-categories/`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',

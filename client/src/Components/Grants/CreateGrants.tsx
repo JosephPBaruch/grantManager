@@ -2,6 +2,7 @@ import { Container, Typography, Paper, TextField, Button } from "@mui/material";
 import { useState } from "react";
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -40,6 +41,7 @@ function CreateBudget() {
   const [totalAmount, setTotalAmount] = useState('');
   const [description, setDescription] = useState('');
   const navigate = useNavigate();
+  const backendHost = useBackendHost();
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -59,7 +61,7 @@ function CreateBudget() {
       description,
     };
 
-    fetch('http://localhost:8000/api/v1/grants/', {
+    fetch(`http://${backendHost}:8000/api/v1/grants/`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',
@@ -73,7 +75,7 @@ function CreateBudget() {
       console.log(data);
       localStorage.setItem('selected_grant_id', data.id);
       localStorage.setItem('selected_grant_title', data.title);
-      navigate("/list-users");
+      navigate("/expenses");
     })
     .catch((error) => {
       console.error('Error:', error);

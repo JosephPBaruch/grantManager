@@ -3,6 +3,7 @@ import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Role } from "../../types/Roles";
 import CreateRoles from "./CreateRoles";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -22,10 +23,11 @@ function Roles() {
   const classes = useStyles();
   const [roles, setRoles] = useState<Role[]>([]); 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const backendHost = useBackendHost();
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-roles/grant/${localStorage.getItem("selected_grant_id")}`, {
         method: 'GET',
         headers: {
             'accept': 'application/json',
@@ -42,6 +44,27 @@ function Roles() {
     }
   };
 
+  const handleDeleteRole = async (roleId: string) => {
+    try {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-roles/${roleId}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete role with ID: ${roleId}`);
+      }
+
+      console.log(`Role with ID: ${roleId} deleted successfully`);
+      setRoles(roles.filter(role => role.id !== roleId));
+    } catch (error) {
+      console.error("Error deleting role:", error);
+    }
+  };
+
   useEffect(() => {
     fetchRoles();
   }, []);
@@ -53,7 +76,7 @@ function Roles() {
   };
 
   return (
-    <Container maxWidth="md" className={classes.root}>
+    <Container maxWidth="lg" className={classes.root}>
       <Typography variant="h4">
         Roles
       </Typography>
@@ -70,6 +93,7 @@ function Roles() {
               <TableCell>Permissions</TableCell>
               <TableCell>Created At</TableCell>
               <TableCell>Updated At</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -81,6 +105,15 @@ function Roles() {
                 <TableCell>{role.permissions.join(", ")}</TableCell>
                 <TableCell>{new Date(role.created_at).toLocaleString()}</TableCell>
                 <TableCell>{new Date(role.updated_at).toLocaleString()}</TableCell>
+                <TableCell>
+                  <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    onClick={() => handleDeleteRole(role.id)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

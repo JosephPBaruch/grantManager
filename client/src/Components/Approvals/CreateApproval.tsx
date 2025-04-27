@@ -2,6 +2,7 @@ import { Container, Typography, Table, TableBody, TableCell, TableContainer, Tab
 import { makeStyles } from '@mui/styles';
 import { useEffect, useState } from "react";
 import { Expense, ExpensesResponse } from "../../types/Approval";
+import { useBackendHost } from "../../host";
 
 const useStyles = makeStyles({
   root: {
@@ -20,13 +21,16 @@ function CreateApprovals() {
   const classes = useStyles();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openRejectDialog, setOpenRejectDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [comment, setComment] = useState<string>("");
+  const backendHost = useBackendHost();
+  
 
   useEffect(() => {
     async function fetchExpenses() {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/grant-approvals/pending-expenses?skip=0&limit=100', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/grant-approvals/pending-expenses?skip=0&limit=100`, {
           method: 'POST',
           headers: {
             'accept': 'application/json',
@@ -68,11 +72,21 @@ function CreateApprovals() {
     setComment("");
   };
 
+  const handleOpenRejectDialog = (expense: Expense) => {
+    setSelectedExpense(expense);
+    setOpenRejectDialog(true);
+  };
+
+  const handleCloseRejectDialog = () => {
+    setOpenRejectDialog(false);
+    setSelectedExpense(null);
+  };
+
   const handleApprove = async () => {
     if (!selectedExpense) return;
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/grant-approvals/', {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-approvals/`, {
         method: 'POST',
         headers: {
           'accept': 'application/json',
@@ -97,6 +111,32 @@ function CreateApprovals() {
       console.error("Error approving expense:", error);
     } finally {
       handleCloseDialog();
+    }
+  };
+
+  const handleReject = async () => {
+    if (!selectedExpense) return;
+
+    try {
+      const response = await fetch(`http://${backendHost}:8000/api/v1/grant-expenses/${selectedExpense.id}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("access_token")}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to reject expense');
+      }
+
+      console.log("Expense rejected successfully:", selectedExpense.id);
+      // Optionally, refresh the list of expenses or update the UI
+      setExpenses(expenses.filter(expense => expense.id !== selectedExpense.id));
+    } catch (error) {
+      console.error("Error rejecting expense:", error);
+    } finally {
+      handleCloseRejectDialog();
     }
   };
 
@@ -141,6 +181,13 @@ function CreateApprovals() {
                   >
                     Approve
                   </Button>
+                  <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    onClick={() => handleOpenRejectDialog(expense)}
+                  >
+                    Reject
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -170,6 +217,23 @@ function CreateApprovals() {
           </Button>
           <Button onClick={handleApprove} color="primary">
             Approve
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openRejectDialog} onClose={handleCloseRejectDialog}>
+        <DialogTitle>Reject Expense</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to reject the expense with ID: {selectedExpense?.id}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRejectDialog} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleReject} color="primary">
+            Reject
           </Button>
         </DialogActions>
       </Dialog>

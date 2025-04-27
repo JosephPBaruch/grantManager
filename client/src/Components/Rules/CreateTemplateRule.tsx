@@ -1,6 +1,7 @@
 import { Container, Button, Dialog, DialogTitle, DialogContent, TextField, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
+import { useBackendHost } from '../../host';
 
 const CreateTemplateRule = () => {
   const [open, setOpen] = useState(false);
@@ -8,11 +9,12 @@ const CreateTemplateRule = () => {
   const [templateName, setTemplateName] = useState('');
   const [kwargs, setKwargs] = useState('{}');
   const [templateOptions, setTemplateOptions] = useState([]);
+  const backendHost = useBackendHost();
 
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/rules/templates/', {
+        const response = await fetch(`http://${backendHost}:8000/api/v1/rules/templates/`, {
           method: 'GET',
           headers: {
             'accept': 'application/json',
@@ -39,7 +41,7 @@ const CreateTemplateRule = () => {
 
   const handleSubmit = async () => {
     try {
-      const url = `http://localhost:8000/api/v1/rules/grant/${grantId}/template/${templateName}?kwargs=${encodeURIComponent(kwargs)}/`;
+      const url = `http://${backendHost}:8000/api/v1/rules/grant/${grantId}/template/${templateName}?kwargs=${encodeURIComponent(kwargs)}/`;
       const response = await fetch(url, {
         method: 'POST',
         headers: {
