@@ -17,9 +17,9 @@ type User = {
 
 const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
   const [grantId, setGrantId] = useState(localStorage.getItem("selected_grant_id"));
-  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState('');
   const [roleType, setRoleType] = useState('');
-  const [permissions, setPermissions] = useState<string[]>([]);
+  const [userId, setUserId] = useState('');
   const [users, setUsers] = useState<User | null>(null);
   const backendHost = useBackendHost();
 
@@ -58,7 +58,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `http://${backendHost}:8000/api/v1/grant-roles/grant/${grantId}/user/${userId}?role_type=${roleType}`,
+        `http://${backendHost}:8000/api/v1/grant-roles/grant/${grantId}/user/${userId}?email=${encodeURIComponent(email)}&role_type=${roleType}`,
         {
           method: 'POST',
           headers: {
@@ -66,7 +66,6 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
             accept: 'application/json',
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
-          body: JSON.stringify({ permissions }),
         }
       );
 
@@ -97,16 +96,16 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           label="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-        //   select
           fullWidth
           margin="normal"
-        >
-          {/* {users && (
-            <MenuItem key={users.id} value={users.id}>
-              {users.full_name}
-            </MenuItem>
-          )} */}
-        </TextField>
+        />
+        <TextField
+          label="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
         <TextField
           label="Role Type"
           value={roleType}
@@ -116,16 +115,9 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           margin="normal"
         >
           <MenuItem value="owner">Owner</MenuItem>
-          <MenuItem value="editor">Editor</MenuItem>
-          <MenuItem value="viewer">Viewer</MenuItem>
+          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="user">User</MenuItem>
         </TextField>
-        <TextField
-          label="Permissions (comma-separated)"
-          value={permissions.join(',')}
-          onChange={(e) => setPermissions(e.target.value.split(','))}
-          fullWidth
-          margin="normal"
-        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
