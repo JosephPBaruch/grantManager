@@ -7,29 +7,6 @@ from fastapi.testclient import TestClient
 if TYPE_CHECKING:
     from tests.conftest import UserData  # noqa: F401
 
-# def test_create_grant(user_login, client: TestClient) -> GrantPublic:
-#     """Test create grant endpoint."""
-#     grant = GrantBase(
-#         title="Test Grant",
-#         funding_agency="IMF",
-#         start_date=str(datetime.now()),
-#         end_date=str(datetime.now() + timedelta(365)),
-#         total_amount=100000,
-#         status="active",
-#         description="Test Grant",
-#     )
-#     data = json.loads(grant.model_dump_json())
-#     response = client.post("/api/v1/grants/", json=data, headers=user_login)
-#     assert response.status_code == 200
-#     data = response.json()
-#     resp_grant = GrantPublic(**data)
-#     assert resp_grant.title == grant.title
-#     assert resp_grant.funding_agency == grant.funding_agency
-#     assert resp_grant.total_amount == grant.total_amount
-#     assert resp_grant.status == grant.status
-#     assert "id" in data
-#     return resp_grant
-
 
 def _get_login_headers(client: TestClient, username, password):
     login_data = {"username": username, "password": password}

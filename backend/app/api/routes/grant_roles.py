@@ -105,3 +105,6 @@ async def delete_grant_role(
     session.delete(role)
     session.commit()
     return {"message": "Role deleted successfully"}
+
+
+# End

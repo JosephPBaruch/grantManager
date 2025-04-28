@@ -1,3 +1,4 @@
+import logging
 from typing import Generator
 
 import psycopg2
@@ -8,8 +9,10 @@ from app.core.config import settings
 from app.main import app
 from app.models import GrantPublic, User, UserCreate
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine, select
 from sqlalchemy.engine import Engine
+from sqlmodel import Session, SQLModel, create_engine, select
+
+logger = logging.getLogger(__name__)
 
 USER_CREATE = {
     "email": "test@test.com",
@@ -52,7 +55,7 @@ def engine_fixture():
     cursor.execute(sql)
     cursor.close()
     conn.close()
-    
+
     engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
     SQLModel.metadata.create_all(engine)
     yield engine
@@ -63,7 +66,10 @@ def session_fixture(engine: Engine):
     with Session(engine) as session:
         yield session
 
-@pytest.fixture(name="client",)
+
+@pytest.fixture(
+    name="client",
+)
 def client_fixture(session: Session):
     def get_db_override():
         yield session
@@ -88,7 +94,10 @@ def test_user_fixture(request: pytest.FixtureRequest, session: Session) -> UserD
 
     user = session.exec(select(User).where(User.email == user_in.email)).first()
     if not user:
+        logging.info(f"test_user_fixture: Creating user {user_in.email}")
         user = crud.create_user(session=session, user_create=user_in)
+    else:
+        logging.info(f"test_user_fixture: User exists: {user_in.email}")
 
     return UserData(password=user_info["password"], **user.model_dump())
 
@@ -108,12 +117,15 @@ def test_superuser_fixture(session: Session) -> UserData:
 def test_user_with_login(
     test_user: UserData, client: TestClient
 ) -> Generator[dict[str, str], None, None]:
+    """Test user login fixture."""
+    logger.info(f"test_user_with_login: {test_user.email}")
     login_data = {"username": test_user.email, "password": test_user.password}
 
     response = client.post("/api/v1/login/access-token", data=login_data)
     assert response.status_code == 200
     data = response.json()
     assert "access_token" in data
+    logger.info(f"test_user_with_login: {data['access_token']}")
     yield {"Authorization": f"Bearer {data['access_token']}"}
 
 

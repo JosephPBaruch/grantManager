@@ -1,4 +1,5 @@
 import re
+from logging import getLogger
 from typing import List
 from uuid import UUID
 
@@ -15,6 +16,8 @@ from app.models import (
     RuleType,
 )
 from app.rule_templates import RULE_TEMPLATES
+
+logger = getLogger("uvicorn.error")
 
 
 def clean(s):
@@ -80,12 +83,16 @@ def _generate_trigger_function(
         
         -- Check filters
     """
+    logger.info(f"Creating trigger function for rule: {rule.name}")
+    logger.info(f"Function name: {function_name}")
+    logger.info(f"sql: {sql}")
 
     # Add filter checks
     for filter in filters:
         field = filter.field
         operator = filter.operator
         value = filter.value
+        logger.info(f"Filter: {field} {operator} {value}")
 
         # Handle grant field references
         if value.startswith("grant."):
@@ -102,9 +109,8 @@ def _generate_trigger_function(
     if rule.rule_type == RuleType.EXPENSE:
         for condition in conditions:
             field = condition.field
-            operator = condition.operator
+            operator = condition.operator.value
             value = condition.value
-
             # Handle grant field references
             if value.startswith("grant."):
                 grant_field = value.split(".")[1]
@@ -129,7 +135,7 @@ def _generate_trigger_function(
         # Add filter conditions to the aggregation query
         for filter in filters:
             field = filter.field
-            operator = filter.operator
+            operator = filter.operator.value
             value = filter.value
 
             if value.startswith("grant."):
@@ -143,7 +149,7 @@ def _generate_trigger_function(
         # Add condition checks for the aggregated value
         for condition in conditions:
             field = condition.field
-            operator = condition.operator
+            operator = condition.operator.value
             value = condition.value
 
             if value.startswith("grant."):
@@ -253,7 +259,11 @@ async def validate_rule(
 
 
 async def create_rule_from_template(
-    session: Session, template_name: str, grant_id: UUID, user_id: UUID, **kwargs
+    session: Session,
+    template_name: str,
+    grant_id: UUID,
+    user_id: UUID,
+    kwargs: dict = {},
 ) -> RulePublic:
     """
     Create a new rule from a template and set up its PostgreSQL trigger.
@@ -262,10 +272,11 @@ async def create_rule_from_template(
         raise ValueError(f"Unknown rule template: {template_name}")
 
     template = RULE_TEMPLATES[template_name]
-
+    logger.info(f"Creating rule from template: {template_name}")
     # Create the rule
     rule = Rule(
         grant_id=grant_id,
+        # created_by=user_id,
         name=kwargs.get("name", template["name"]),
         description=kwargs.get("description", template["description"]),
         rule_type=template["rule_type"],
@@ -273,6 +284,7 @@ async def create_rule_from_template(
         error_message=kwargs.get("error_message", template["error_message"]),
         is_active=True,
     )
+
     session.add(rule)
     session.commit()
     session.refresh(rule)
@@ -358,3 +370,6 @@ async def delete_rule(session: Session, rule_id: UUID) -> None:
     if rule:
         session.delete(rule)
         session.commit()
+
+
+# End

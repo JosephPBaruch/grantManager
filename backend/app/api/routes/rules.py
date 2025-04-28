@@ -1,11 +1,12 @@
 import uuid
 from logging import getLogger
 from typing import Any, List
+from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
 from sqlmodel import func, select
 
-from app.api.deps import CurrentSuperUser, CurrentUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep
 from app.models import (
     Grant,
     GrantPermission,
@@ -16,7 +17,7 @@ from app.models import (
     RulePublic,
     RulesPublic,
 )
-from app.permissions import has_grant_permission
+from app.permissions import get_user_grants_with_permission, has_grant_permission
 from app.rule_templates import RULE_TEMPLATES
 from app.rules import InvalidRule, create_rule_from_template, validate_rule
 
@@ -28,20 +29,31 @@ logger = getLogger("uvicorn.error")
     "/",
     response_model=RulesPublic,
 )
-def read_rules(
-    session: SessionDep, _: CurrentSuperUser, skip: int = 0, limit: int = 100
+async def read_rules(
+    session: SessionDep, user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
     Returns a list of all the current rules in the database.
     """
+    if user.is_superuser:
+        count_statement = select(func.count()).select_from(Rule)
+        count = session.exec(count_statement).one()
 
-    count_statement = select(func.count()).select_from(Rule)
-    count = session.exec(count_statement).one()
+        statement = select(Rule).offset(skip).limit(limit)
+        rules = session.exec(statement).all()
 
-    statement = select(Rule).offset(skip).limit(limit)
-    users = session.exec(statement).all()
+        return RulesPublic(data=rules, count=count)
+    else:
+        grants: List[UUID] = await get_user_grants_with_permission(
+            session=session, user_id=user.id, permission=GrantPermission.CREATE_RULES
+        )
+        count_statement = select(func.count()).select_from(Rule)
+        count = session.exec(count_statement).one()
 
-    return RulesPublic(data=users, count=count)
+        statement = (
+            select(Rule).where(Rule.grant_id in grants).offset(skip).limit(limit)
+        )
+        rules = session.exec(statement).all()
 
 
 @router.post("/", response_model=RulePublic)
@@ -124,12 +136,18 @@ async def read_grant_rules(
     """
     # Verify that the user has access to the grant
     permission = await has_grant_permission(
-        session, str(grant_id), GrantPermission.CREATE_RULES, current_user
+        session=session,
+        user_id=current_user.id,
+        grant_id=grant_id,
+        permission=GrantPermission.CREATE_RULES,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    statement = select(Rule).where(Rule.grant_id == grant_id)
+    # statement = select(Rule).where(Rule.grant_id == grant_id)
+    statement = (
+        select(Rule).where(Rule.grant_id == grant_id).order_by(Rule.created_at.desc())
+    )
     rules = session.exec(statement).all()
     count = len(rules)
 
@@ -150,7 +168,7 @@ async def create_rule_from_template_endpoint(
     grant_id: str,
     template_name: str,
     current_user: CurrentUser,
-    **kwargs: Any,
+    kwargs: dict[str, Any] = dict(),
 ) -> Any:
     """
     Create a new rule from a template.
@@ -165,10 +183,9 @@ async def create_rule_from_template_endpoint(
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-
     try:
         rule = await create_rule_from_template(
-            session, template_name, grant_id, current_user.id, **kwargs
+            session, template_name, uuid.UUID(grant_id), current_user.id, kwargs
         )
         return rule
     except ValueError as e:
@@ -218,7 +235,10 @@ async def update_rule(
         raise HTTPException(status_code=404, detail="Rule not found")
 
     permission = await has_grant_permission(
-        session, str(rule.grant_id), GrantPermission.CREATE_RULES, current_user
+        session=session,
+        grant_id=rule.grant_id,
+        permission=GrantPermission.CREATE_RULES,
+        user_id=current_user.id,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")

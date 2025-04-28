@@ -90,7 +90,7 @@ class RuleType(str, Enum):
     BUDGET = "budget"
 
 
-class RuleOperator(str, Enum):
+class RuleOperator(Enum):
     """Enum for rule operators."""
 
     EQUALS = "="
