@@ -36,3 +36,25 @@ def create_user(user_in: PrivateUserCreate, session: SessionDep) -> Any:
     session.commit()
 
     return user
+
+
+SAMPLE_GRANT = {
+    "users": [
+        {
+            "email": "john@example.com",
+            "full_name": "John Doe",
+            "password": "password123",
+            "is_verified": True,
+        },
+        {
+            "email": "sam@example.com",
+            "full_name": "Sam Smith",
+            "password": "password123",
+            "is_verified": True,
+        },
+    ],
+}
+
+# @router.post("/sample_grant")
+# def create_sample_grant(session: SessionDep):
+#     pass
