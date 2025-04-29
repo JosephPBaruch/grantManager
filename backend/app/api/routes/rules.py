@@ -22,6 +22,7 @@ from app.rule_templates import RULE_TEMPLATES
 from app.rules import (
     InvalidRule,
     create_rule_from_template,
+    create_trigger,
     delete_rule,
     get_rule_by_id,
     update_rule,
@@ -130,6 +131,9 @@ async def create_rule(
         session.add(condition)
         conditions.append(condition)
     session.commit()
+    # Create the PostgreSQL trigger
+    create_trigger(session, rule, filters, conditions)
+    session.refresh(rule)
     # Validate rule
     await validate_rule(session, rule, filters, conditions)
 

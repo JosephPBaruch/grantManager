@@ -172,7 +172,7 @@ def _generate_trigger_function(
     return sql
 
 
-def _create_trigger(
+def create_trigger(
     session: Session,
     rule: Rule,
     filters: List[RuleFilter],
@@ -317,7 +317,7 @@ async def create_rule_from_template(
     session.commit()
 
     # Create the PostgreSQL trigger
-    _create_trigger(session, rule, filters, conditions)
+    create_trigger(session, rule, filters, conditions)
     session.refresh(rule)
 
     return RulePublic(
@@ -401,7 +401,7 @@ async def update_rule(
         conditions = session.exec(
             select(RuleCondition).where(RuleCondition.rule_id == rule_id)
         ).all()
-        _create_trigger(session, rule, filters, conditions)
+        create_trigger(session, rule, filters, conditions)
     else:
         _remove_trigger(session, rule_id)
 
