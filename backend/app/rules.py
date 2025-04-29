@@ -83,16 +83,16 @@ def _generate_trigger_function(
         
         -- Check filters
     """
-    logger.info(f"Creating trigger function for rule: {rule.name}")
-    logger.info(f"Function name: {function_name}")
-    logger.info(f"sql: {sql}")
+    # logger.info(f"Creating trigger function for rule: {rule.name}")
+    # logger.info(f"Function name: {function_name}")
+    # logger.info(f"sql: {sql}")
 
     # Add filter checks
     for filter in filters:
         field = filter.field
         operator = filter.operator
         value = filter.value
-        logger.info(f"Filter: {field} {operator} {value}")
+        # logger.info(f"Filter: {field} {operator} {value}")
 
         # Handle grant field references
         if value.startswith("grant."):
@@ -100,7 +100,7 @@ def _generate_trigger_function(
             value = f"grant_{grant_field}"
 
         sql += f"""
-        IF NOT (NEW.{field} {operator} {value}) THEN
+        IF NOT (NEW.{field} {operator.value} {value}) THEN
             RETURN NEW;
         END IF;
         """
@@ -327,35 +327,98 @@ async def create_rule_from_template(
     )
 
 
-async def update_rule(session: Session, rule_id: UUID, is_active: bool) -> Rule:
+async def update_rule(
+    session: Session, rule_id: UUID, rule_in: RulePublic
+) -> RulePublic:
     """
-    Update a rule's active status and manage its trigger accordingly.
+    Update a rule using a RulePublic object and manage its trigger accordingly.
     """
+    # Fetch the existing rule
     rule = session.get(Rule, rule_id)
     if not rule:
         raise ValueError(f"Rule not found: {rule_id}")
 
-    if rule.is_active != is_active:
-        rule.is_active = is_active
+    # Update the rule fields
+    rule_data = rule_in.model_dump(exclude_unset=True)
+    for key, value in rule_data.items():
+        if key == "filters" or key == "conditions":
+            continue
+        if key in rule.model_fields.keys():
+            setattr(rule, key, value)
+    session.add(rule)
+    session.commit()
+    session.refresh(rule)
+
+    # Update filters
+    if "filters" in rule_data:
+        # Remove existing filters
+        filters = session.exec(select(RuleFilter).where(RuleFilter.rule_id == rule_id))
+        for filter in filters:
+            session.delete(filter)
         session.commit()
 
-        if is_active:
-            # Get filters and conditions
-            filters = session.exec(
-                select(RuleFilter).where(RuleFilter.rule_id == rule_id)
-            ).all()
+        # Add new filters
+        for filter_data in rule_in.filters:
+            new_filter = RuleFilter(
+                rule_id=rule_id,
+                field=filter_data.field,
+                operator=filter_data.operator,
+                value=filter_data.value,
+            )
+            session.add(new_filter)
 
-            conditions = session.exec(
-                select(RuleCondition).where(RuleCondition.rule_id == rule_id)
-            ).all()
+    # Update conditions
+    if "conditions" in rule_data:
+        # Remove existing conditions
 
-            # Create the trigger
-            _create_trigger(session, rule, filters, conditions)
-        else:
-            # Remove the trigger
-            _remove_trigger(session, rule_id)
+        conditions = session.exec(
+            select(RuleCondition).where(RuleCondition.rule_id == rule_id)
+        )
+        for condition in conditions:
+            session.delete(condition)
 
-    return rule
+        session.commit()
+
+        # Add new conditions
+        for condition_data in rule_in.conditions:
+            new_condition = RuleCondition(
+                rule_id=rule_id,
+                field=condition_data.field,
+                operator=condition_data.operator,
+                value=condition_data.value,
+                order=condition_data.order,
+            )
+            session.add(new_condition)
+
+    session.commit()
+    session.refresh(rule)
+
+    # Manage triggers based on the rule's active status
+    if rule.is_active:
+        filters = session.exec(
+            select(RuleFilter).where(RuleFilter.rule_id == rule_id)
+        ).all()
+        conditions = session.exec(
+            select(RuleCondition).where(RuleCondition.rule_id == rule_id)
+        ).all()
+        _create_trigger(session, rule, filters, conditions)
+    else:
+        _remove_trigger(session, rule_id)
+
+    # Return the updated rule as a RulePublic object
+    filters = session.exec(
+        select(RuleFilter).where(RuleFilter.rule_id == rule_id)
+    ).all()
+    conditions = session.exec(
+        select(RuleCondition).where(RuleCondition.rule_id == rule_id)
+    ).all()
+    session.refresh(rule)
+
+    return RulePublic(
+        **rule.model_dump(),
+        filters=filters,
+        conditions=conditions,
+    )
 
 
 async def delete_rule(session: Session, rule_id: UUID) -> None:
@@ -368,8 +431,36 @@ async def delete_rule(session: Session, rule_id: UUID) -> None:
     # Delete the rule
     rule = session.get(Rule, rule_id)
     if rule:
+        conditions = session.exec(
+            select(RuleCondition).where(RuleCondition.rule_id == rule_id)
+        )
+        for condition in conditions:
+            session.delete(condition)
+
+        filters = session.exec(select(RuleFilter).where(RuleFilter.rule_id == rule_id))
+        for filter in filters:
+            session.delete(filter)
+
         session.delete(rule)
         session.commit()
+
+
+async def get_rule_by_id(session: Session, rule_id: UUID) -> RulePublic:
+    """Get a rule by its ID."""
+    rule = session.get(Rule, rule_id)
+    if not rule:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    filters = session.exec(
+        select(RuleFilter).where(RuleFilter.rule_id == rule_id)
+    ).all()
+    conditions = session.exec(
+        select(RuleCondition).where(RuleCondition.rule_id == rule_id)
+    ).all()
+    return RulePublic(
+        **rule.model_dump(),
+        filters=filters,
+        conditions=conditions,
+    )
 
 
 # End

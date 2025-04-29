@@ -1,4 +1,7 @@
 import pytest
+from app.models import (
+    RulePublic,
+)
 from fastapi.testclient import TestClient
 
 RULE_TEMPLATES = {
@@ -41,7 +44,7 @@ def created_rule(user_login: dict, grant_data, client: TestClient):
 
 
 def test_read_grant_rules_non_empty(
-    user_login: dict, grant_data, client: TestClient, created_rule
+    user_login: dict, grant_data, client: TestClient, created_rule: RulePublic
 ):
     """After creation, GET /rules/grant/{grant_id} returns one rule."""
     grant_id = grant_data.id
@@ -54,20 +57,20 @@ def test_read_grant_rules_non_empty(
     assert rule["name"] == created_rule["name"]
 
 
-def test_update_and_deactivate_rule(user_login: dict, client: TestClient, created_rule):
+def test_update_and_deactivate_rule(
+    user_login: dict, client: TestClient, created_rule: dict
+):
     """PUT /rules/{rule_id} can deactivate a rule."""
     rid = created_rule["id"]
+    created_rule["is_active"] = False
     # deactivate
-    r = client.put(
-        f"/api/v1/rules/{rid}", json={"is_active": False}, headers=user_login
-    )
+    r = client.put(f"/api/v1/rules/{rid}", json=created_rule, headers=user_login)
     assert r.status_code == 200
     updated = r.json()
     assert updated["is_active"] is False
     # reactivate
-    r2 = client.put(
-        f"/api/v1/rules/{rid}", json={"is_active": True}, headers=user_login
-    )
+    created_rule["is_active"] = True
+    r2 = client.put(f"/api/v1/rules/{rid}", json=created_rule, headers=user_login)
     assert r2.status_code == 200
     assert r2.json()["is_active"] is True
 

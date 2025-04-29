@@ -161,14 +161,24 @@ def test_grant_permissions(
     """Test grant permissions."""
     # Create a grant
     grant_id = grant_data.id
-
+    other_grant_data = {
+        "title": "Test Grant",
+        "funding_agency": "Test Agency",
+        "start_date": "2024-01-01T00:00:00Z",
+        "end_date": "2024-12-31T00:00:00Z",
+        "total_amount": 100000.0,
+        "description": "Test grant description",
+    }
+    response = client.post("/api/v1/grants/", json=grant_data, headers=user_login)
+    data = response.json()
+    other_grant = GrantPublic(**data)
     # Try to access grant with different permissions
     response = client.get(f"/api/v1/grants/{grant_id}", headers=user_login)
     assert response.status_code == 200  # Should have view permission
 
     # Try to update without manage permission
     update_data = {"title": "Unauthorized Update", "total_amount": 999999.0}
-    response = client.put(
+    response = client.patch(
         f"/api/v1/grants/{grant_id}", json=update_data, headers=user_login
     )
     # This should fail if user doesn't have manage permission

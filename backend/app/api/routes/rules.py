@@ -19,7 +19,14 @@ from app.models import (
 )
 from app.permissions import get_user_grants_with_permission, has_grant_permission
 from app.rule_templates import RULE_TEMPLATES
-from app.rules import InvalidRule, create_rule_from_template, validate_rule
+from app.rules import (
+    InvalidRule,
+    create_rule_from_template,
+    delete_rule,
+    get_rule_by_id,
+    update_rule,
+    validate_rule,
+)
 
 router = APIRouter(prefix="/rules", tags=["Rules"])
 logger = getLogger("uvicorn.error")
@@ -39,8 +46,9 @@ async def read_rules(
         count_statement = select(func.count()).select_from(Rule)
         count = session.exec(count_statement).one()
 
-        statement = select(Rule).offset(skip).limit(limit)
+        statement = select(Rule.id).offset(skip).limit(limit)
         rules = session.exec(statement).all()
+        rules = [await get_rule_by_id(session, rule_id) for rule_id in rules]
 
         return RulesPublic(data=rules, count=count)
     else:
@@ -54,6 +62,8 @@ async def read_rules(
             select(Rule).where(Rule.grant_id in grants).offset(skip).limit(limit)
         )
         rules = session.exec(statement).all()
+        rules = [await get_rule_by_id(session, rule_id) for rule_id in rules]
+        return RulesPublic(data=rules, count=count)
 
 
 @router.post("/", response_model=RulePublic)
@@ -221,7 +231,7 @@ async def create_custom_rule(
 
 
 @router.put("/{rule_id}", response_model=RulePublic)
-async def update_rule(
+async def update_rule_route(
     session: SessionDep, rule_id: str, rule_in: RulePublic, current_user: CurrentUser
 ) -> Any:
     """
@@ -243,19 +253,17 @@ async def update_rule(
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    rule_data = rule_in.model_dump(exclude_unset=True)
-    for key, value in rule_data.items():
-        setattr(rule, key, value)
+    ret = await update_rule(
+        session=session,
+        rule_id=rule_id,
+        rule_in=rule_in,
+    )
 
-    session.add(rule)
-    session.commit()
-    session.refresh(rule)
-
-    return rule
+    return ret
 
 
 @router.delete("/{rule_id}")
-async def delete_rule(
+async def delete_rule_route(
     session: SessionDep, rule_id: str, current_user: CurrentUser
 ) -> Any:
     """
@@ -267,12 +275,15 @@ async def delete_rule(
         raise HTTPException(status_code=404, detail="Rule not found")
 
     permission = await has_grant_permission(
-        session, str(rule.grant_id), GrantPermission.CREATE_RULES, current_user
+        session=session,
+        grant_id=rule.grant_id,
+        permission=GrantPermission.CREATE_RULES,
+        user_id=current_user.id,
     )
     if not permission:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    session.delete(rule)
+    await delete_rule(session, rule_id)
     session.commit()
     return {"message": "Rule deleted successfully"}
 

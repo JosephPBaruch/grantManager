@@ -1,8 +1,8 @@
-"""New Rules System
+"""New Base
 
-Revision ID: 7f773ae79e12
+Revision ID: 834de18c19ae
 Revises: 
-Create Date: 2025-04-14 14:57:04.354592
+Create Date: 2025-04-29 17:52:37.913574
 
 """
 from typing import Sequence, Union
@@ -14,7 +14,7 @@ import sqlmodel.sql.sqltypes
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '7f773ae79e12'
+revision: str = '834de18c19ae'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,47 +45,32 @@ def upgrade() -> None:
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
     op.create_table('grant',
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(length=255), nullable=False),
-    sa.Column('grant_number', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('funding_agency', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('owner_id', sa.Uuid(), nullable=False),
     sa.Column('start_date', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('end_date', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('total_amount', sa.Float(), nullable=False),
     sa.Column('status', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('owner_id', sa.Uuid(), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_grant_grant_number'), 'grant', ['grant_number'], unique=True)
     op.create_table('grant_expense',
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('date', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('category', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('invoice_number', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('status', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('grant_id', sa.Uuid(), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('created_by', sa.Uuid(), nullable=False),
+    sa.ForeignKeyConstraint(['category'], ['grant_category.code'], ),
     sa.ForeignKeyConstraint(['created_by'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('grant_approval',
-    sa.Column('grant_id', sa.Uuid(), nullable=False),
-    sa.Column('expense_id', sa.Uuid(), nullable=True),
-    sa.Column('approver_id', sa.Uuid(), nullable=False),
-    sa.Column('status', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('comments', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('level', sa.Integer(), nullable=False),
-    sa.Column('id', sa.Uuid(), nullable=False),
-    sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.ForeignKeyConstraint(['approver_id'], ['user.id'], ),
-    sa.ForeignKeyConstraint(['expense_id'], ['grant_expense.id'], ),
     sa.ForeignKeyConstraint(['grant_id'], ['grant.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -112,9 +97,19 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
     sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
-    sa.Column('created_by', sa.Uuid(), nullable=False),
-    sa.ForeignKeyConstraint(['created_by'], ['user.id'], ),
     sa.ForeignKeyConstraint(['grant_id'], ['grant.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('grant_approval',
+    sa.Column('expense_id', sa.Uuid(), nullable=True),
+    sa.Column('status', sa.Enum('APPROVED', 'REJECTED', name='approvalstatus'), nullable=False),
+    sa.Column('comments', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
+    sa.Column('updated_at', sa.TIMESTAMP(timezone=True), nullable=False),
+    sa.Column('approver_id', sa.Uuid(), nullable=False),
+    sa.ForeignKeyConstraint(['approver_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['expense_id'], ['grant_expense.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('rule_condition',
@@ -161,11 +156,10 @@ def downgrade() -> None:
     op.drop_table('rule_trigger')
     op.drop_table('rule_filter')
     op.drop_table('rule_condition')
+    op.drop_table('grant_approval')
     op.drop_table('rule')
     op.drop_table('grant_role')
-    op.drop_table('grant_approval')
     op.drop_table('grant_expense')
-    op.drop_index(op.f('ix_grant_grant_number'), table_name='grant')
     op.drop_table('grant')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')
