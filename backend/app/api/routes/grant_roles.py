@@ -37,7 +37,7 @@ async def read_grant_roles(
     return GrantRolesPublic(data=roles, count=count)
 
 
-@router.post("/grant/{grant_id}/user/{user_id}", response_model=GrantRolePublic)
+@router.post("/grant/{grant_id}", response_model=GrantRolePublic)
 async def create_grant_role(
     session: SessionDep,
     grant_id: str,
@@ -50,7 +50,10 @@ async def create_grant_role(
     Only users with MANAGE_ROLES permission can create roles.
     """
     has_permission = await has_grant_permission(
-        session, current_user.id, uuid.UUID(grant_id), GrantPermission.MANAGE_ROLES
+        session=session,
+        user_id=current_user.id,
+        grant_id=uuid.UUID(grant_id),
+        permission=GrantPermission.MANAGE_ROLES,
     )
 
     if not has_permission:
@@ -89,7 +92,10 @@ async def delete_grant_role(
     """
 
     has_permission = await has_grant_permission(
-        session, current_user.id, uuid.UUID(grant_id), GrantPermission.MANAGE_ROLES
+        session=session,
+        user_id=current_user.id,
+        grant_id=uuid.UUID(grant_id),
+        permission=GrantPermission.MANAGE_ROLES,
     )
 
     if not has_permission:

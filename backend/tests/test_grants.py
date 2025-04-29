@@ -105,55 +105,6 @@ def test_update_grant(
     assert data["total_amount"] == update_data["total_amount"]
 
 
-# def test_archive_grant(user_login: dict, client: TestClient) -> None:
-#     """Test archiving a grant."""
-#     # First create a grant
-#     grant_id = test_create_grant(user_login, client)
-
-#     # Then archive it
-#     response = client.delete(f"/api/v1/grants/{grant_id}", headers=user_login)
-#     assert response.status_code == 200
-#     assert response.json()["message"] == "Grant deleted successfully"
-
-#     # Verify grant can't be found
-#     response = client.get(f"/api/v1/grants/{grant_id}", headers=user_login)
-#     assert response.status_code == 404
-
-# def test_superuser_delete_grant(
-#     test_superuser: UserData,
-#     client: TestClient
-# ) -> None:
-#     """Test superuser deleting a grant."""
-#     # First login as superuser
-#     login_data = {"username": test_superuser.email, "password": test_superuser.password}
-#     response = client.post("/api/v1/login/access-token", data=login_data)
-#     assert response.status_code == 200
-#     superuser_token = response.json()["access_token"]
-#     superuser_headers = {"Authorization": f"Bearer {superuser_token}"}
-
-#     # Create a grant
-#     grant_data = {
-#         "title": "Superuser Grant",
-#         "funding_agency": "Superuser Agency",
-#         "start_date": "2024-01-01T00:00:00Z",
-#         "end_date": "2024-12-31T00:00:00Z",
-#         "total_amount": 300000.0,
-#         "description": "Superuser grant description"
-#     }
-#     response = client.post("/api/v1/grants/", json=grant_data, headers=superuser_headers)
-#     assert response.status_code == 200
-#     grant_id = response.json()["id"]
-
-#     # Delete the grant
-#     response = client.delete(f"/api/v1/grants/delete/{grant_id}", headers=superuser_headers)
-#     assert response.status_code == 200
-#     assert response.json()["message"] == "Grant deleted successfully"
-
-#     # Verify grant can't be found
-#     response = client.get(f"/api/v1/grants/{grant_id}", headers=superuser_headers)
-#     assert response.status_code == 404
-
-
 @pytest.mark.username("testUser")
 def test_grant_permissions(
     user_login: dict, client: TestClient, grant_data: GrantPublic
