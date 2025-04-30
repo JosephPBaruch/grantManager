@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Card, CardContent, CircularProgress } from '@mui/material';
+import { Container, Typography, Card, CardContent, CircularProgress, LinearProgress, Box } from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import 'react-toastify/dist/ReactToastify.css';
 import { useBackendHost } from '../host';
@@ -70,26 +70,32 @@ const Home: React.FC = () => {
 
   return (
     <Container maxWidth="sm">
-      <Typography style={{ paddingTop: '20px' }} variant="h4" component="h1" gutterBottom>
-        Home
-      </Typography>
+        <br />
       {loading ? (
         <CircularProgress />
       ) : grantData ? (
         <Card>
           <CardContent>
-            <Typography variant="h6">Grant ID:</Typography>
-            <Typography>{grantData.grant_id}</Typography>
-            <Typography variant="h6">Existing Expense Amount:</Typography>
-            <Typography>${grantData.existing_expense_amount}</Typography>
-            <Typography variant="h6">Projected Expense Amount:</Typography>
-            <Typography>${grantData.projected_expense_amount}</Typography>
-            <Typography variant="h6">Grant Total Funds:</Typography>
-            <Typography>${grantData.grant_total_funds}</Typography>
-            <Typography variant="h6">Grant Projected Remaining Funds:</Typography>
-            <Typography>${grantData.grant_projected_remaining_funds}</Typography>
-            <Typography variant="h6">Grant Current Remaining Funds:</Typography>
-            <Typography>${grantData.grant_current_remaining_funds}</Typography>
+            <Typography variant="h6">Existing Expense Amount: ${grantData.existing_expense_amount}</Typography>
+            <Typography variant="h6">Projected Expense Amount: ${grantData.projected_expense_amount}</Typography>
+            <Typography variant="h6">Grant Total Funds: ${grantData.grant_total_funds}</Typography>
+            <Typography variant="h6">Grant Projected Remaining Funds: ${grantData.grant_projected_remaining_funds}</Typography>
+            <Typography variant="h6" style={{ marginTop: '20px' }}>Grant Current Remaining Funds: ${grantData.grant_current_remaining_funds}</Typography>
+            <Box mt={2}>
+              <Typography variant="body1">Projected Remaining Funds Progress:</Typography>
+              <LinearProgress
+                variant="determinate"
+                value={(grantData.grant_projected_remaining_funds / grantData.grant_total_funds) * 100}
+              />
+            </Box>
+
+            <Box mt={2}>
+              <Typography variant="body1">Current Remaining Funds Progress:</Typography>
+              <LinearProgress
+                variant="determinate"
+                value={(grantData.grant_current_remaining_funds / grantData.grant_total_funds) * 100}
+              />
+            </Box>
           </CardContent>
         </Card>
       ) : (
