@@ -17,6 +17,7 @@ import Approvals from './Components/Approvals/Approvals';
 import Categories from './Components/Categories/Categories';
 import Roles from './Components/Roles/Roles';
 import CreateApprovals from './Components/Approvals/CreateApproval';
+import Home from './Components/Home';
 
 const useStyles = makeStyles({
   root: {
@@ -102,6 +103,9 @@ function LocationBasedComponents() {
             {isAuthenticated && (
             <>
               <Button color="inherit">
+                <Link to="/home" className={classes.link}>Home</Link>
+              </Button>
+              <Button color="inherit">
                 <Link to="/expenses" className={classes.link}>Expenses</Link>
               </Button>
               <Button color="inherit">
@@ -136,6 +140,8 @@ function LocationBasedComponents() {
           <Routes>
             <Route path="/" element={<SignIn />} />
             <Route path="/sign-up" element={<SignUp />} />
+            
+            <Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 
             <Route path="/expenses" element={<ProtectedRoute element={<ViewTransactions />} />} />
             <Route path="/create-expenses" element={<ProtectedRoute element={<Transactions />} />} />
