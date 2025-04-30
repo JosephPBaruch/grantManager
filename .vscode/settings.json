@@ -10,7 +10,8 @@
     },
     "ruff.organizeImports": true,
     "python.testing.pytestArgs": [
-        "backend"
+        "backend",
+        "--log-cli-level=DEBUG",
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,

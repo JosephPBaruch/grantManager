@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from collections.abc import Generator
 from typing import Annotated
 from uuid import UUID
@@ -14,6 +15,8 @@ from app.core.config import settings
 from app.core.db import engine
 from app.models import GrantPermission, TokenPayload, User
 from app.permissions import has_grant_permission
+
+logger = logging.getLogger("uvicorn.error")
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -100,6 +103,10 @@ class GrantPermissionChecker:
         Check if the current user has a specific permission for a grant.
         Raises HTTPException if the user doesn't have the permission.
         """
+        logger.info(
+            f"Checking permission {self.permission} for user {current_user.id} on grant {grant_id}"
+        )
+        logger.info(f"Grant ID: {grant_id}, type: {type(grant_id)}")
         has_permission = asyncio.run(
             has_grant_permission(
                 session, current_user.id, UUID(grant_id), self.permission

@@ -1,9 +1,12 @@
+from logging import getLogger
 from typing import List
 from uuid import UUID
 
 from sqlmodel import Session, select
 
 from app.models import GrantPermission, GrantRole, GrantRoleType, User
+
+logger = getLogger("uvicorn.error")
 
 # Default permissions for each role type
 DEFAULT_ROLE_PERMISSIONS = {
@@ -52,7 +55,10 @@ async def has_grant_permission(
 ) -> bool:
     """Check if a user has a specific permission for a grant."""
     # First check if the user is a superuser
-    user = session.get(User, user_id)
+    logger.info(
+        f"Checking permissions: {permission} for user {user_id} on grant {grant_id}"
+    )
+    user = session.exec(select(User).where(User.id == user_id)).first()
     if user and user.is_superuser:
         return True
 
@@ -101,3 +107,18 @@ async def create_default_grant_role(
     session.commit()
     session.refresh(role)
     return role
+
+
+async def get_user_grants_with_permission(
+    session: Session, user_id: UUID, role_type: GrantRoleType = None
+) -> List[UUID]:
+    """Get all grants a user has roles for."""
+    statement = (
+        select(GrantRole.grant_id)
+        .where(GrantRole.user_id == user_id)
+        .where(GrantRole.role_type == role_type)
+    )
+    return session.exec(statement).all()
+
+
+# End

@@ -7,29 +7,6 @@ from fastapi.testclient import TestClient
 if TYPE_CHECKING:
     from tests.conftest import UserData  # noqa: F401
 
-# def test_create_grant(user_login, client: TestClient) -> GrantPublic:
-#     """Test create grant endpoint."""
-#     grant = GrantBase(
-#         title="Test Grant",
-#         funding_agency="IMF",
-#         start_date=str(datetime.now()),
-#         end_date=str(datetime.now() + timedelta(365)),
-#         total_amount=100000,
-#         status="active",
-#         description="Test Grant",
-#     )
-#     data = json.loads(grant.model_dump_json())
-#     response = client.post("/api/v1/grants/", json=data, headers=user_login)
-#     assert response.status_code == 200
-#     data = response.json()
-#     resp_grant = GrantPublic(**data)
-#     assert resp_grant.title == grant.title
-#     assert resp_grant.funding_agency == grant.funding_agency
-#     assert resp_grant.total_amount == grant.total_amount
-#     assert resp_grant.status == grant.status
-#     assert "id" in data
-#     return resp_grant
-
 
 def _get_login_headers(client: TestClient, username, password):
     login_data = {"username": username, "password": password}
@@ -128,55 +105,6 @@ def test_update_grant(
     assert data["total_amount"] == update_data["total_amount"]
 
 
-# def test_archive_grant(user_login: dict, client: TestClient) -> None:
-#     """Test archiving a grant."""
-#     # First create a grant
-#     grant_id = test_create_grant(user_login, client)
-
-#     # Then archive it
-#     response = client.delete(f"/api/v1/grants/{grant_id}", headers=user_login)
-#     assert response.status_code == 200
-#     assert response.json()["message"] == "Grant deleted successfully"
-
-#     # Verify grant can't be found
-#     response = client.get(f"/api/v1/grants/{grant_id}", headers=user_login)
-#     assert response.status_code == 404
-
-# def test_superuser_delete_grant(
-#     test_superuser: UserData,
-#     client: TestClient
-# ) -> None:
-#     """Test superuser deleting a grant."""
-#     # First login as superuser
-#     login_data = {"username": test_superuser.email, "password": test_superuser.password}
-#     response = client.post("/api/v1/login/access-token", data=login_data)
-#     assert response.status_code == 200
-#     superuser_token = response.json()["access_token"]
-#     superuser_headers = {"Authorization": f"Bearer {superuser_token}"}
-
-#     # Create a grant
-#     grant_data = {
-#         "title": "Superuser Grant",
-#         "funding_agency": "Superuser Agency",
-#         "start_date": "2024-01-01T00:00:00Z",
-#         "end_date": "2024-12-31T00:00:00Z",
-#         "total_amount": 300000.0,
-#         "description": "Superuser grant description"
-#     }
-#     response = client.post("/api/v1/grants/", json=grant_data, headers=superuser_headers)
-#     assert response.status_code == 200
-#     grant_id = response.json()["id"]
-
-#     # Delete the grant
-#     response = client.delete(f"/api/v1/grants/delete/{grant_id}", headers=superuser_headers)
-#     assert response.status_code == 200
-#     assert response.json()["message"] == "Grant deleted successfully"
-
-#     # Verify grant can't be found
-#     response = client.get(f"/api/v1/grants/{grant_id}", headers=superuser_headers)
-#     assert response.status_code == 404
-
-
 @pytest.mark.username("testUser")
 def test_grant_permissions(
     user_login: dict, client: TestClient, grant_data: GrantPublic
@@ -184,14 +112,24 @@ def test_grant_permissions(
     """Test grant permissions."""
     # Create a grant
     grant_id = grant_data.id
-
+    other_grant_data = {
+        "title": "Test Grant",
+        "funding_agency": "Test Agency",
+        "start_date": "2024-01-01T00:00:00Z",
+        "end_date": "2024-12-31T00:00:00Z",
+        "total_amount": 100000.0,
+        "description": "Test grant description",
+    }
+    response = client.post("/api/v1/grants/", json=grant_data, headers=user_login)
+    data = response.json()
+    other_grant = GrantPublic(**data)
     # Try to access grant with different permissions
     response = client.get(f"/api/v1/grants/{grant_id}", headers=user_login)
     assert response.status_code == 200  # Should have view permission
 
     # Try to update without manage permission
     update_data = {"title": "Unauthorized Update", "total_amount": 999999.0}
-    response = client.put(
+    response = client.patch(
         f"/api/v1/grants/{grant_id}", json=update_data, headers=user_login
     )
     # This should fail if user doesn't have manage permission

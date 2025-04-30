@@ -90,7 +90,7 @@ class RuleType(str, Enum):
     BUDGET = "budget"
 
 
-class RuleOperator(str, Enum):
+class RuleOperator(Enum):
     """Enum for rule operators."""
 
     EQUALS = "="
@@ -470,3 +470,17 @@ class RuleTrigger(SQLModel, table=True):
         default_factory=get_utc_now,
         sa_column=Column(TIMESTAMP(timezone=True), nullable=False),
     )
+
+
+class ExpenseProjection(SQLModel):
+    """Model for expense projection."""
+
+    grant_id: uuid.UUID = Field(foreign_key="grant.id")
+    existing_expense_amount: float = Field()
+    projected_expense_amount: float = Field()
+    grant_total_funds: float = Field()
+    grant_projected_remaining_funds: float = Field()
+    grant_current_remaining_funds: float = Field()
+
+
+# END

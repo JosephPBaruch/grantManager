@@ -3,3 +3,4 @@
 postgres/data
 .cursor/
 .env
+tmp/
