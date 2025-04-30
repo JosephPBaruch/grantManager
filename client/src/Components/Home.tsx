@@ -24,6 +24,7 @@ const Home: React.FC = () => {
     const classes = useStyles();
     const backendHost = useBackendHost();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [grantData, setGrantData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const accessToken = localStorage.getItem('access_token');
