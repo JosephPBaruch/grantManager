@@ -47,7 +47,7 @@ const CreateUser: React.FC = () => {
       password,
     };
 
-    fetch(`http://${backendHost}:8000/api/v1/users/`, {
+    fetch(`http://${backendHost}:8000/api/v1/users/signup/`, {
       method: 'POST',
       headers: {
         'accept': 'application/json',
