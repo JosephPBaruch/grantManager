@@ -243,13 +243,18 @@ function ListUsers() {
     })
     .then((response) => response.json())
     .then((data) => {
-      console.log(data.data);
-      setUsers(data.data);
-      // toast.success('Users fetched successfully');
+      if (data && Array.isArray(data.data)) {
+        console.log(data.data);
+        setUsers(data.data);
+      } else {
+        console.error('Invalid data format or no users found');
+        setUsers([]);
+      }
     })
     .catch((error) => {
       console.error('Error fetching users:', error);
       toast.error('Error fetching users');
+      setUsers([]); // Ensure users state is set to an empty array on error
     });
   }, []);
 
@@ -382,7 +387,7 @@ function ListUsers() {
       <Button variant="contained" color="primary" onClick={() => navigate('/create-users')}>
         Create User
       </Button>
-      {users ? (
+      {users && users.length > 0 ? (
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
