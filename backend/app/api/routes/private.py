@@ -60,6 +60,12 @@ SAMPLE_GRANT = {
             "password": "password123",
             "is_verified": True,
         },
+        {
+            "email": "barney@example.com",
+            "full_name": "Barney Clown",
+            "password": "password123",
+            "is_verified": True,
+        },
     ],
     "grant": GrantBase(
         title="Sample Grant",
@@ -176,7 +182,7 @@ def create_sample_grant(session: SessionDep):
         session.commit()
 
     for expense in SAMPLE_GRANT["grant_expenses"]:
-        expense = GrantExpense(**expense)
+        expense = GrantExpense(**expense, created_by=user_ids[0])
         expense.grant_id = grant.id
         session.add(expense)
         session.commit()
