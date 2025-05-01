@@ -33,14 +33,14 @@ type FormData = {
 const CreateRules = () => {
   const [formData, setFormData] = useState<FormData>({
     grant_id: localStorage.getItem('selected_grant_id') || '',
-    name: '',
-    description: '',
-    rule_type: '',
-    aggregator: '',
-    error_message: '',
+    name: 'Name',
+    description: 'Desc',
+    rule_type: 'expense',
+    aggregator: 'MAX',
+    error_message: 'Rule Error',
     is_active: true,
     filters: [{ field: '', operator: '=', value: '' }],
-    conditions: [{ field: '', operator: '=', value: '', order: 0 }],
+    conditions: [{ field: 'amount', operator: '<=', value: '10', order: 0 }],
   });
   const backendHost = useBackendHost();
 
@@ -78,22 +78,37 @@ const CreateRules = () => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('token');
+    console.log('Submit button clicked'); // Debugging log
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      toast.error('Authorization token is missing.');
+      return;
+    }
+
     try {
-      const response = await fetch(`http://${backendHost}:8000/api/v1/rules/`, {
-        method: 'POST',
-        headers: {
-          'accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `http://${backendHost}:8000/api/v1/rules/?grant_id=${formData.grant_id}`,
+        {
+          method: 'POST',
+          headers: {
+            'accept': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...formData,
+            filters: formData.filters.filter(filter => filter.field && filter.operator && filter.value),
+            conditions: formData.conditions.filter(condition => condition.field && condition.operator && condition.value),
+          }),
+        }
+      );
 
       if (response.ok) {
         toast.success('Rule created successfully!');
       } else {
-        toast.error('Failed to create rule.');
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        toast.error(`Failed to create rule: ${errorData.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error creating rule:', error);
