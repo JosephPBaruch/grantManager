@@ -60,22 +60,16 @@ const Home: React.FC = () => {
           <CardContent>
           <Typography variant="h3">Grant Fund Projection</Typography>
           <Box mt={2}>
-          <Typography variant="h4">Current: ${grantData.grant_current_remaining_funds} / ${grantData.grant_total_funds}</Typography>
-              <LinearProgress
-                variant="determinate"
-                value={(grantData.grant_current_remaining_funds / grantData.grant_total_funds) * 100}
-              />
-            </Box>
-            <br />
-
-            <Box mt={2}>
-            <Typography variant="h6">Projected: ${grantData.grant_projected_remaining_funds} / ${grantData.grant_total_funds}</Typography>
+          <Typography variant="h4">Current: ${grantData.grant_projected_remaining_funds} / ${grantData.grant_total_funds}</Typography>
               <LinearProgress
                 variant="determinate"
                 value={(grantData.grant_projected_remaining_funds / grantData.grant_total_funds) * 100}
               />
             </Box>
-
+            <br />
+            <Typography variant="h6">Total Expense Amount: ${grantData.existing_expense_amount + grantData.projected_expense_amount}</Typography>
+            <Typography variant="h6">Approved Expense Amount: ${grantData.projected_expense_amount}</Typography>
+            <Typography variant="h6">Pending Expense Amount: ${grantData.existing_expense_amount}</Typography>
           </CardContent>
         </Card>
       ) : (
