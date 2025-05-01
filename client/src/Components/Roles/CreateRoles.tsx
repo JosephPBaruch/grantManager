@@ -19,7 +19,6 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const [grantId, setGrantId] = useState(localStorage.getItem("selected_grant_id"));
   const [email, setEmail] = useState('');
   const [roleType, setRoleType] = useState('');
-  const [userId, setUserId] = useState('');
   const [users, setUsers] = useState<User | null>(null);
   const backendHost = useBackendHost();
 
@@ -58,7 +57,7 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `http://${backendHost}:8000/api/v1/grant-roles/grant/${grantId}/user/${userId}?email=${encodeURIComponent(email)}&role_type=${roleType}`,
+        `http://${backendHost}:8000/api/v1/grant-roles/grant/${grantId}?email=${encodeURIComponent(email)}&role_type=${roleType}`,
         {
           method: 'POST',
           headers: {
@@ -89,13 +88,6 @@ const CreateRoles = ({ open, onClose }: { open: boolean; onClose: () => void }) 
           label="Grant ID"
           value={grantId}
           onChange={(e) => setGrantId(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="User ID"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
           fullWidth
           margin="normal"
         />
