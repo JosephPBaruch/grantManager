@@ -177,6 +177,11 @@ def create_sample_grant(session: SessionDep):
             )
 
     for category in SAMPLE_GRANT["grant_expense_categories"]:
+        cat = session.exec(
+            select(GrantCategory).where(GrantCategory.code == category.code)
+        ).first()
+        if cat:
+            continue
         category = GrantCategory(**category.model_dump())
         session.add(category)
         session.commit()
